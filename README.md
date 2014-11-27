@@ -17,6 +17,10 @@ In an attempt to comply with the 2015 changes to VAT and the EU, this plugin pre
 
 In addition, it adds a *required* checkbox that has the customer confirm they're not from the EU.
 
+Credit to [Michelle](http://thegiddyknitter.com/2014/11/19/wip-wednesday-solutions-digital-businesses-eu-vat) for the idea
+
+Forked from [EDD Prevent Checkout](http://sumobi.com/shop/edd-prevent-checkout/) by Sumobi
+
 ## Installation ##
 
 After installation, visit the EDD Extensions page and edit the values for "Prevent EU Checkout"
@@ -26,7 +30,7 @@ After installation, visit the EDD Extensions page and edit the values for "Preve
 ###1. The Setting Page
 ###
 ![The Setting Page
-](https://ps.w.org/edd-prevent-checkout/assets/screenshot-1.png)
+](screenshot-1.png)
 
 
 ## Frequently Asked Questions ##
