@@ -37,7 +37,7 @@ After installation, visit the EDD Extensions page and edit the values for "Preve
 
 ### Why do I care if someone's from the EU? ###
 
-On the 1st of January 2015, the VAT place of supply rules will change and make it a legal requirement that you charge VAT on a product sold to someone, based on the country where the buyer is. This means you will have to be registered for VAT in that country. There are 28 countries in the EU with 75 rates of VAT, so seller of digital products would need to be registered in every country where someone buys their products.
+On the 1st of January 2015, the VAT place of supply rules will change and make it a legal requirement that you charge VAT on a product sold to someone, based on the country where the buyer is. This means you will have to be registered for VAT in that country. There are 28 countries in the EU with 75 rates of VAT, however under a special provision for non-EU businesses, a *non-EU* firm need register in only one EU country.
 
 It's currently unknown if this applies to US based business or not. One argument is that it shouldn't, since we're not in the bloody EU. The other is that it does because the US agreed to a 1998 OECD agreement, we're in trouble too.
 
@@ -45,7 +45,7 @@ Please read [EU-VAT](http://rachelandrew.github.io/eu-vat/) and contact legal pr
 
 ### Why does this plugin just block the EU? ###
 
-The easiest solution for most small business is to simply stop offering their products to the EU from their own stores. So here you go.
+The easiest solution for most small business is to simply stop offering their products to the EU from their own stores. So here you go. If you intend to go for VAT registration, this isn't the plugin for you.
 
 ### How do I know if I absolutely must use this? ###
 
@@ -62,6 +62,11 @@ That's why there's a checkbox added to checkout to have the user confirm they're
 ### What if they lie? ###
 
 Then they broke the law, not you.
+
+## What countries are included? ##
+
+Everyone in the EU (Austria, Belgium, Bulgaria, Croatia, Republic of Cyprus, Czech Republic, Denmark, Estonia, Finland, France, Germany, Greece, Hungary, Ireland, Italy, Latvia, Lithuania, Luxembourg, Malta, Netherlands, Poland, Portugal, Romania, Slovakia, Slovenia, Spain, Sweden and the UK) plus South Africa.
+
 
 ## Changelog ##
 
