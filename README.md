@@ -1,7 +1,9 @@
 # EDD - Sucks to be EU #
 
 **Donate:** https://store.halfelf.org/donate/
+
 **License:** GPLv2 or later  
+
 **License URI:** http://www.gnu.org/licenses/gpl-2.0.html
   
 Prevents customer from being able to checkout if they're from the EU.
@@ -17,9 +19,8 @@ In an attempt to comply with the 2015 changes to VAT and the EU, this plugin pre
 
 In addition, it adds a *required* checkbox that has the customer confirm they're not from the EU.
 
-Credit to [Michelle](http://thegiddyknitter.com/2014/11/19/wip-wednesday-solutions-digital-businesses-eu-vat) for the idea
-
-Forked from [EDD Prevent Checkout](http://sumobi.com/shop/edd-prevent-checkout/) by Sumobi
+* Credit to [Michelle](http://thegiddyknitter.com/2014/11/19/wip-wednesday-solutions-digital-businesses-eu-vat) for the idea
+* Forked from [EDD Prevent Checkout](http://sumobi.com/shop/edd-prevent-checkout/) by Sumobi
 
 ## Installation ##
 
@@ -29,8 +30,7 @@ After installation, visit the EDD Extensions page and edit the values for "Preve
 
 ###1. The Setting Page
 ###
-![The Setting Page
-](screenshot-1.png)
+![The Setting Page](screenshot-01.png)
 
 
 ## Frequently Asked Questions ##
@@ -41,7 +41,7 @@ On the 1st of January 2015, the VAT place of supply rules will change and make i
 
 It's currently unknown if this applies to US based business or not. One argument is that it shouldn't, since we're not in the bloody EU. The other is that it does because the US agreed to a 1998 OECD agreement, we're in trouble too.
 
-Please read (EU-VAT)[http://rachelandrew.github.io/eu-vat/] and contact legal professionals with any and all questions of if you need to use this or not.
+Please read [EU-VAT](http://rachelandrew.github.io/eu-vat/) and contact legal professionals with any and all questions of if you need to use this or not.
 
 ### Why does this plugin just block the EU? ###
 
@@ -53,7 +53,7 @@ You hire a lawyer and let them sort it out. I'm not a lawyer. I'm not even sure 
 
 ### How does it know if someone is in the EU? ###
 
-It checks their IP address against http://www.hostip.info
+It checks their IP address against GeoIP (if installed with your PHP) and then against http://www.hostip.info
 
 ### What if that's wrong? ###
 
