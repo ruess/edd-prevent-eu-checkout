@@ -168,7 +168,11 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 				$this_country = file_get_contents('http://api.hostip.info/country.php?ip=' . $ip );
 			}
 
-			if ( ( in_array( $this_country, $countries ) || array_key_exists( $this_country, $countries ) ) && ( $edd_options['edd_pc_exclude'] != $this_country ) && ( $checkbox = TRUE ) ) {
+			if (
+				$checkbox == TRUE &&
+				$this_country != $edd_options['edd_pc_exclude'] &&
+				array_key_exists( $this_country, $this->eu_get_country_list() )
+			) {
 				$canblock = TRUE;
 			} else {
 				$canblock = FALSE;
@@ -204,7 +208,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 		*/
 		function can_checkout( $can_checkout  ) {
 
-			if ( $this->block_eu_required() == TRUE && $this->ip_validation() == TRUE ) {
+			if ( $this->block_eu_required() == TRUE ) {
 				$can_checkout = false;
 			}
 
@@ -224,13 +228,16 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 
 			global $edd_options;
 
-			?>
-			<p id="edd-eu-wrap">
-				<label class="edd-label" for="edd-eu"><?php _e('I confirm I do not reside in the European Union.', 'edd-prevent-eu-checkout', 'edd-prevent-eu-checkout'); ?></label>
-				<span class="edd-description"><?php echo $edd_options['edd_pc_checkout_message']; ?></span>
-				<input class="edd-input" type="checkbox" name="edd_eu" id="edd-eu" value="1" />
-			</p>
-			<?php
+			$checkbox = isset( $edd_options['edd_pc_checkbox'] ) ? $edd_options['edd_pc_checkbox'] : '';
+			if ( $checkbox == TRUE ) {
+				?>
+				<p id="edd-eu-wrap">
+					<label class="edd-label" for="edd-eu"><?php _e('I confirm I do not reside in the European Union.', 'edd-prevent-eu-checkout', 'edd-prevent-eu-checkout'); ?></label>
+					<span class="edd-description"><?php echo $edd_options['edd_pc_checkout_message']; ?></span>
+					<input class="edd-input" type="checkbox" name="edd_eu" id="edd-eu" value="1" />
+				</p>
+				<?php
+			}
 		}
 
 		/**
@@ -326,9 +333,8 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 			if ( in_array($input['edd_pc_exclude'], $this->eu_get_country_list()) || array_key_exists($input['edd_pc_exclude'], $this->eu_get_country_list()) ) {
 				$input['edd_pc_exclude'] = $input['edd_pc_exclude'];
 			} else {
-				$input['edd_pc_exclude'] = 0;
+				$input['edd_pc_exclude'] = null;
 			}
-
 
 			return $input;
 		}
