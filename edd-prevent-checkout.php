@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: EDD - Prevent Checkout for the EU
-Plugin URI: 
+Plugin URI:
 Description: Prevents customer from being able to checkout if they're from the EU because VAT laws are stupid.
 Version: 1.0
 Author: Andrew Munro (Sumobi), Mika A. Epstein (Ipstenu)
@@ -70,13 +70,13 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 
 			// add settings
 			add_filter( 'edd_settings_extensions', array( $this, 'settings' ) );
-			
+
 			// sanitize settings
 			add_filter( 'edd_settings_extensions_sanitize', array( $this, 'sanitize_settings' ) );
-			
+
 			// Add checkout field
 			add_action('edd_purchase_form_user_info', array( $this, 'custom_checkout_fields') );
-			
+
 			// Validate checkout field
 			add_action('edd_checkout_error_checks', array( $this, 'validate_custom_fields'), 10, 2);
 
@@ -95,23 +95,73 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 
 		/**
 		 * Check if restrictions need to be applied
+		 * If the checkbox is true and the country is on the list, we block
 		 *
 		 * @since 1.0
 		*/
 		function block_eu_required() {
+
 			global $edd_options;
 
+			// Set the checkbox
 			$checkbox = isset( $edd_options['edd_pc_checkbox'] ) ? $edd_options['edd_pc_checkbox'] : '';
-			
-			$ip_check = $this->ip_validation();
 
-			if ( $checkbox == TRUE && $ip_check == TRUE ) {
-				$block_eu = TRUE;
+			// List all countries, EU and otherwise, who require VAT in order to sell digital goods
+			$countries = array(
+				"AT"=>"Austria",
+				"BE"=>"Belgium",
+				"BG"=>"Bulgaria",
+				"HR"=>"Croatia",
+				"CY"=>"Republic of Cyprus",
+				"CZ"=>"Czech Republic",
+				"DK"=>"Denmark",
+				"EE"=>"Estonia",
+				"FI"=>"Finland",
+				"FR"=>"France",
+				"DE"=>"Germany",
+				"GR"=>"Greece",
+				"HU"=>"Hungary",
+				"IE"=>"Ireland",
+				"IT"=>"Italy",
+				"LV"=>"Latvia",
+				"LT"=>"Lithuania",
+				"LU"=>"Luxembourg",
+				"MT"=>"Malta",
+				"NL"=>"Netherlands",
+				"PL"=>"Poland",
+				"PT"=>"Portugal",
+				"RO"=>"Romania",
+				"SK"=>"Slovakia",
+				"SI"=>"Slovenia",
+				"ES"=>"Spain",
+				"SE"=>"Sweden",
+				"GB"=>"United Kingdom",
+				"ZA"=>"South Africa"
+			);
+
+			if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+				$ip=$_SERVER['HTTP_CLIENT_IP'];
+			} elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+				$ip=$_SERVER['HTTP_X_FORWARDED_FOR'];
+		    } else {
+				$ip=$_SERVER['REMOTE_ADDR'];
+    		}
+
+			if (function_exists('geoip_country_code_by_name')) {
+				// If you have GeoIP installed, it's much easier: http://php.net/manual/en/book.geoip.php
+				$this_country = geoip_country_code_by_name( $ip );
 			} else {
-				$block_eu = FALSE;
+				// Otherwise we use HostIP.info which is GPL
+				$this_country = file_get_contents('http://api.hostip.info/country.php?ip=' . $ip );
 			}
 
-			return $block_eu;
+			if ( ( in_array( $this_country, $countries ) || array_key_exists( $this_country, $countries ) ) && ( $edd_options['edd_pc_exclude'] != $this_country ) && ( $checkbox = TRUE ) ) {
+				$canblock = TRUE;
+			} else {
+				$canblock = FALSE;
+			}
+
+			return $canblock;
 		}
 
 		/**
@@ -120,7 +170,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 		 * @since 1.0
 		*/
 		function set_error() {
-			
+
 			global $edd_options;
 
 			if ( $this->block_eu_required() == TRUE ) {
@@ -132,7 +182,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 
 			edd_print_errors();
 		}
-		
+
 		/**
 		 * Can checkout?
 		 * Prevents the form from being displayed at all until the user's IP is outside the EU
@@ -140,7 +190,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 		 * @since 1.0
 		*/
 		function can_checkout( $can_checkout  ) {
-		
+
 			if ( $this->block_eu_required() == TRUE && $this->ip_validation() == TRUE ) {
 				$can_checkout = false;
 			}
@@ -149,43 +199,6 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 		}
 
 		/**
-		 * Validate IP to see if it's European
-		 *
-		 * @since 1.0
-		*/
-		function ip_validation( ) {
-			
-			global $edd_options;
-			
-			$countries = array("AT"=>"Austria","BE"=>"Belgium","BG"=>"Bulgaria","HR"=>"Croatia","CY"=>"Republic of Cyprus","CZ"=>"Czech Republic","DK"=>"Denmark","EE"=>"Estonia","FI"=>"Finland","FR"=>"France","DE"=>"Germany","GR"=>"Greece","HU"=>"Hungary","IE"=>"Ireland","IT"=>"Italy","LV"=>"Latvia","LT"=>"Lithuania","LU"=>"Luxembourg","MT"=>"Malta","NL"=>"Netherlands","PL"=>"Poland","PT"=>"Portugal","RO"=>"Romania","SK"=>"Slovakia","SI"=>"Slovenia","ES"=>"Spain","SE"=>"Sweden", "GB"=>"United Kingdom");
-
-			if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
-				$ip=$_SERVER['HTTP_CLIENT_IP'];
-			} elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-				$ip=$_SERVER['HTTP_X_FORWARDED_FOR'];
-		    } else {
-				$ip=$_SERVER['REMOTE_ADDR'];
-    		}
-		
-			if (function_exists('geoip_country_code_by_name')) {
-				// If you have GeoIP installed, it's much easier: http://php.net/manual/en/book.geoip.php
-				$this_country = geoip_country_code_by_name( $ip );
-			} else {
-				// Otherwise we use HostIP.info which is GPL
-				$this_country = file_get_contents('http://api.hostip.info/country.php?ip=' . $ip );
-			}
-			
-			if ( ( in_array( $this_country, $countries ) || array_key_exists( $this_country, $countries ) ) && ( $edd_options['edd_pc_exclude'] != $this_country ) ) {
-				$ip_check = TRUE;
-			} else {
-				$ip_check = FALSE;
-			}
-			
-			return $ip_check;
-			
-		}
-		
-		/**
 		 * Custom Checkout Field
 		 * A confirmation box. In the event someone made it all the way through IP checks
 		 * we STILL need to cover our damn asses and make sure they're not really in the
@@ -193,11 +206,11 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 		 *
 		 * @since 1.0
 		*/
-		
+
 		function custom_checkout_fields() {
 
 			global $edd_options;
-			
+
 			?>
 			<p id="edd-eu-wrap">
 				<label class="edd-label" for="edd-eu"><?php _e('I confirm I do not reside in the European Union.', 'edd-prevent-eu-checkout', 'edd-prevent-eu-checkout'); ?></label>
@@ -214,7 +227,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 		*/
 
 		function validate_custom_fields($valid_data, $data) {
-			
+
 			global $edd_options;
 
 			if ( !isset( $data['edd_eu'] ) || $data['edd_eu'] != '1' ) {
@@ -295,12 +308,12 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 
 			// Sanitize edd_pc_checkout_message
 			$input['edd_pc_checkout_message'] = wp_kses_post( $input['edd_pc_checkout_message'] );
-			
+
 			// Sanitize edd_pc_exclude (to do - Not sure here!)
 
 			return $input;
 		}
-		
+
 	}
 
 }
