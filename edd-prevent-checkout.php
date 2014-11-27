@@ -100,8 +100,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 		 * @since       1.0
 		 * @return      array
 		 */
-
-		public function eu_get_country_list() {
+		function eu_get_country_list() {
 
 			$countries = array(
 				"AT"=>"Austria",
@@ -223,7 +222,6 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 		 *
 		 * @since 1.0
 		*/
-
 		function custom_checkout_fields() {
 
 			global $edd_options;
@@ -245,7 +243,6 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 		 *
 		 * @since 1.0
 		*/
-
 		function validate_custom_fields($valid_data, $data) {
 
 			global $edd_options;
@@ -355,4 +352,5 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 function edd_prevent_eu_checkout_load() {
 	$edd_prevent_checkout = new EDD_Prevent_EU_Checkout();
 }
+
 add_action( 'plugins_loaded', 'edd_prevent_eu_checkout_load' );
