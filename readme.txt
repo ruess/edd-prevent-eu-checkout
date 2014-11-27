@@ -1,6 +1,6 @@
 === EDD - Sucks to be EU ===
 Contributors: Ipstenu
-Donate link: 
+Donate link: https://store.halfelf.org/donate/
 Tags: easy digital downloads, edd, purchase, prevent, checkout, e-commerce, eu, VAT
 Requires at least: 3.3
 Tested up to: 4.0.1
