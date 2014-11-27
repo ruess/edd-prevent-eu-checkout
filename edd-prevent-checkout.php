@@ -94,19 +94,15 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 		}
 
 		/**
-		 * Check if restrictions need to be applied
-		 * If the checkbox is true and the country is on the list, we block
+		 * Get EU (and related) Country List
 		 *
-		 * @since 1.0
-		*/
-		function block_eu_required() {
+		 * @access      public
+		 * @since       1.0
+		 * @return      array
+		 */
 
-			global $edd_options;
+		public function eu_get_country_list() {
 
-			// Set the checkbox
-			$checkbox = isset( $edd_options['edd_pc_checkbox'] ) ? $edd_options['edd_pc_checkbox'] : '';
-
-			// List all countries, EU and otherwise, who require VAT in order to sell digital goods
 			$countries = array(
 				"AT"=>"Austria",
 				"BE"=>"Belgium",
@@ -138,6 +134,23 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 				"GB"=>"United Kingdom",
 				"ZA"=>"South Africa"
 			);
+
+			//return apply_filters( 'eu_country_list', $countries );
+			return $countries;
+		}
+
+		/**
+		 * Check if restrictions need to be applied
+		 * If the checkbox is true and the country is on the list, we block
+		 *
+		 * @since 1.0
+		*/
+		function block_eu_required() {
+
+			global $edd_options;
+
+			// Set the checkbox
+			$checkbox = isset( $edd_options['edd_pc_checkbox'] ) ? $edd_options['edd_pc_checkbox'] : '';
 
 			if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
 				$ip=$_SERVER['HTTP_CLIENT_IP'];
@@ -280,7 +293,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 				array(
 					'id' => 'edd_pc_exclude',
 					'name' => __( 'Exclude Country', 'edd-prevent-eu-checkout' ),
-					'desc' => __( 'If sales are permitted from your own country, select it from this dropdown.', 'edd-prevent-eu-checkout' ),
+					'desc' => __( 'If sales are permitted from your own country, select it from this dropdown. (Invalid countries cannot be selected.)', 'edd-prevent-eu-checkout' ),
 					'type' => 'select',
 					'options' => edd_get_country_list()
 				),
@@ -309,7 +322,13 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 			// Sanitize edd_pc_checkout_message
 			$input['edd_pc_checkout_message'] = wp_kses_post( $input['edd_pc_checkout_message'] );
 
-			// Sanitize edd_pc_exclude (to do - Not sure here!)
+			// Sanitize edd_pc_exclude
+			if ( in_array($input['edd_pc_exclude'], $this->eu_get_country_list()) || array_key_exists($input['edd_pc_exclude'], $this->eu_get_country_list()) ) {
+				$input['edd_pc_exclude'] = $input['edd_pc_exclude'];
+			} else {
+				$input['edd_pc_exclude'] = 0;
+			}
+
 
 			return $input;
 		}
