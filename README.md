@@ -28,10 +28,9 @@ After installation, visit the EDD Extensions page and edit the values for "Preve
 
 ## Screenshots ##
 
-###1. The Setting Page
-###
-![The Setting Page](screenshot-01.png)
+###1. The Setting Page ###
 
+![The Setting Page](https://raw.githubusercontent.com/Ipstenu/edd-prevent-eu-checkout/master/screnshot-01.png)
 
 ## Frequently Asked Questions ##
 
