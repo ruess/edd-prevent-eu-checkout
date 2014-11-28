@@ -80,7 +80,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 			// Validate checkout field
 			add_action('edd_checkout_error_checks', array( $this, 'validate_custom_fields'), 10, 2);
 
-			do_action( 'edd_pc_setup_actions' );
+			do_action( 'edd_pceu_setup_actions' );
 
 		}
 
@@ -100,7 +100,8 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 		 * @since       1.0
 		 * @return      array
 		 */
-		function eu_get_country_list() {
+
+		public function eu_get_country_list() {
 
 			$countries = array(
 				"AT"=>"Austria",
@@ -149,7 +150,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 			global $edd_options;
 
 			// Set the checkbox
-			$checkbox = isset( $edd_options['edd_pc_checkbox'] ) ? $edd_options['edd_pc_checkbox'] : '';
+			$checkbox = isset( $edd_options['edd_pceu_checkbox'] ) ? $edd_options['edd_pceu_checkbox'] : '';
 
 			if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
 				$ip=$_SERVER['HTTP_CLIENT_IP'];
@@ -169,7 +170,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 
 			if (
 				$checkbox == TRUE &&
-				$this_country != $edd_options['edd_pc_exclude'] &&
+				$this_country != $edd_options['edd_pceu_exclude'] &&
 				array_key_exists( $this_country, $this->eu_get_country_list() )
 			) {
 				$canblock = TRUE;
@@ -190,7 +191,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 			global $edd_options;
 
 			if ( $this->block_eu_required() == TRUE ) {
-				edd_set_error( 'eu_not_allowed', apply_filters( 'edd_pc_error_message', $edd_options['edd_pc_checkout_message'] ) );
+				edd_set_error( 'eu_not_allowed', apply_filters( 'edd_pceu_error_message', $edd_options['edd_pceu_checkout_message'] ) );
 			}
 			else {
 				edd_unset_error( 'eu_not_allowed' );
@@ -222,17 +223,17 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 		 *
 		 * @since 1.0
 		*/
+
 		function custom_checkout_fields() {
 
 			global $edd_options;
 
-			$checkbox = isset( $edd_options['edd_pc_checkbox'] ) ? $edd_options['edd_pc_checkbox'] : '';
+			$checkbox = isset( $edd_options['edd_pceu_checkbox'] ) ? $edd_options['edd_pceu_checkbox'] : '';
 			if ( $checkbox == TRUE ) {
 				?>
 				<p id="edd-eu-wrap">
-					<label class="edd-label" for="edd-eu"><?php _e('I confirm I do not reside in the European Union.', 'edd-prevent-eu-checkout', 'edd-prevent-eu-checkout'); ?></label>
-					<span class="edd-description"><?php echo $edd_options['edd_pc_checkout_message']; ?></span>
-					<input class="edd-input" type="checkbox" name="edd_eu" id="edd-eu" value="1" />
+					<label class="edd-label" for="edd-eu"><?php _e('EU VAT Compliance Confirmation', 'edd-prevent-eu-checkout', 'edd-prevent-eu-checkout'); ?></label>
+					<span class="edd-description"><input class="edd-checkbox" type="checkbox" id="edd-eu" value="1" /> <?php _e('By checking this box you confirm you are either a business or not a legal EU resident.', 'edd-prevent-eu-checkout', 'edd-prevent-eu-checkout'); ?></span>
 				</p>
 				<?php
 			}
@@ -243,13 +244,14 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 		 *
 		 * @since 1.0
 		*/
+
 		function validate_custom_fields($valid_data, $data) {
 
 			global $edd_options;
 
 			if ( !isset( $data['edd_eu'] ) || $data['edd_eu'] != '1' ) {
 				$data['edd_eu'] = 0;
-				edd_set_error( 'eu_not_checked', apply_filters( 'edd_pc_error_message', $edd_options['edd_pc_checkout_message'] ) );
+				edd_set_error( 'eu_not_checked', apply_filters( 'edd_pceu_error_message', $edd_options['edd_pceu_checkout_message'] ) );
 			} else {
 				$data['edd_eu'] = 1;
 			}
@@ -263,15 +265,15 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 		*/
 		function settings( $settings ) {
 
-		  $edd_pc_settings = array(
+		  $edd_pceu_settings = array(
 				array(
-					'id' => 'edd_pc_header',
+					'id' => 'edd_pceu_header',
 					'name' => '<strong>' . __( 'Prevent EU Checkout', 'edd-prevent-eu-checkout' ) . '</strong>',
 					'type' => 'header'
 				),
 
 				array(
-					'id' => 'edd_pc_checkbox',
+					'id' => 'edd_pceu_checkbox',
 					'name' => __( 'Enable Blocking of EU Sales', 'edd-prevent-eu-checkout' ),
 					'desc' => __( 'Check this box to prevent EU customers from completing checkout.', 'edd-prevent-eu-checkout' ),
 					'type' => 'checkbox',
@@ -279,7 +281,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 				),
 
 				array(
-					'id' => 'edd_pc_general_message',
+					'id' => 'edd_pceu_general_message',
 					'name' => __( 'General Message', 'edd-prevent-eu-checkout' ),
 					'desc' => __( 'Will be displayed at the top of every page where [downloads] is used.', 'edd-prevent-eu-checkout' ),
 					'type' => 'textarea',
@@ -287,7 +289,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 				),
 
 				array(
-					'id' => 'edd_pc_checkout_message',
+					'id' => 'edd_pceu_checkout_message',
 					'name' => __( 'Checkout Message', 'edd-prevent-eu-checkout' ),
 					'desc' => __( 'Will be displayed on attempt to checkout by someone in the EU.', 'edd-prevent-eu-checkout' ),
 					'type' => 'textarea',
@@ -295,15 +297,22 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 				),
 
 				array(
-					'id' => 'edd_pc_exclude',
+					'id' => 'edd_pceu_exclude',
 					'name' => __( 'Exclude Country', 'edd-prevent-eu-checkout' ),
 					'desc' => __( 'If sales are permitted from your own country, select it from this dropdown. (Invalid countries cannot be selected.)', 'edd-prevent-eu-checkout' ),
 					'type' => 'select',
 					'options' => edd_get_country_list()
 				),
+
+				array(
+					'id' => 'edd_pceu_footnote',
+					'name' => '<a href="http://www.hostip.info">My IP Address Lookup</a>',
+					'type' => 'header'
+				),
+
 			);
 
-			return array_merge( $settings, $edd_pc_settings );
+			return array_merge( $settings, $edd_pceu_settings );
 		}
 
 		/**
@@ -314,23 +323,23 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 		function sanitize_settings( $input ) {
 
 			// Sanitize checkbox
-			if ( ! isset( $input['edd_pc_checkbox'] ) || $input['edd_pc_checkbox'] != '1' ) {
-				$input['edd_pc_checkbox'] = 0;
+			if ( ! isset( $input['edd_pceu_checkbox'] ) || $input['edd_pceu_checkbox'] != '1' ) {
+				$input['edd_pceu_checkbox'] = 0;
 			} else {
-				$input['edd_pc_checkbox'] = 1;
+				$input['edd_pceu_checkbox'] = 1;
 			}
 
-			// Sanitize edd_pc_general_message
-			$input['edd_pc_general_message'] = wp_kses_post( $input['edd_pc_general_message'] );
+			// Sanitize edd_pceu_general_message
+			$input['edd_pceu_general_message'] = wp_kses_post( $input['edd_pceu_general_message'] );
 
-			// Sanitize edd_pc_checkout_message
-			$input['edd_pc_checkout_message'] = wp_kses_post( $input['edd_pc_checkout_message'] );
+			// Sanitize edd_pceu_checkout_message
+			$input['edd_pceu_checkout_message'] = wp_kses_post( $input['edd_pceu_checkout_message'] );
 
-			// Sanitize edd_pc_exclude
-			if ( in_array($input['edd_pc_exclude'], $this->eu_get_country_list()) || array_key_exists($input['edd_pc_exclude'], $this->eu_get_country_list()) ) {
-				$input['edd_pc_exclude'] = $input['edd_pc_exclude'];
+			// Sanitize edd_pceu_exclude
+			if ( in_array($input['edd_pceu_exclude'], $this->eu_get_country_list()) || array_key_exists($input['edd_pceu_exclude'], $this->eu_get_country_list()) ) {
+				$input['edd_pceu_exclude'] = $input['edd_pceu_exclude'];
 			} else {
-				$input['edd_pc_exclude'] = null;
+				$input['edd_pceu_exclude'] = null;
 			}
 
 			return $input;
@@ -352,5 +361,4 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 function edd_prevent_eu_checkout_load() {
 	$edd_prevent_checkout = new EDD_Prevent_EU_Checkout();
 }
-
 add_action( 'plugins_loaded', 'edd_prevent_eu_checkout_load' );
