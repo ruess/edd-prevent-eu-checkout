@@ -3,7 +3,7 @@
 Plugin Name: EDD - Prevent Checkout for the EU
 Plugin URI:
 Description: Prevents customer from being able to checkout if they're from the EU because VAT laws are stupid.
-Version: 1.0
+Version: 1.0-BETA
 Author: Andrew Munro (Sumobi), Mika A. Epstein (Ipstenu)
 Author URI: http://sumobi.com/
 License: GPL-2.0+
@@ -104,39 +104,182 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 		public function eu_get_country_list() {
 
 			$countries = array(
-				"AT"=>"Austria",
-				"BE"=>"Belgium",
-				"BG"=>"Bulgaria",
-				"HR"=>"Croatia",
-				"CY"=>"Republic of Cyprus",
-				"CZ"=>"Czech Republic",
-				"DK"=>"Denmark",
-				"EE"=>"Estonia",
-				"FI"=>"Finland",
-				"FR"=>"France",
-				"DE"=>"Germany",
-				"GR"=>"Greece",
-				"HU"=>"Hungary",
-				"IE"=>"Ireland",
-				"IT"=>"Italy",
-				"LV"=>"Latvia",
-				"LT"=>"Lithuania",
-				"LU"=>"Luxembourg",
-				"MT"=>"Malta",
-				"NL"=>"Netherlands",
-				"PL"=>"Poland",
-				"PT"=>"Portugal",
-				"RO"=>"Romania",
-				"SK"=>"Slovakia",
-				"SI"=>"Slovenia",
-				"ES"=>"Spain",
-				"SE"=>"Sweden",
-				"GB"=>"United Kingdom",
-				"ZA"=>"South Africa"
+				'AT' => 'Austria',
+				'BE' => 'Belgium',
+				'BG' => 'Bulgaria',
+				'HR' => 'Croatia',
+				'CY' => 'Republic of Cyprus',
+				'CZ' => 'Czech Republic',
+				'DK' => 'Denmark',
+				'EE' => 'Estonia',
+				'FI' => 'Finland',
+				'FR' => 'France',
+				'DE' => 'Germany',
+				'GR' => 'Greece',
+				'HU' => 'Hungary',
+				'IE' => 'Ireland',
+				'IT' => 'Italy',
+				'LV' => 'Latvia',
+				'LT' => 'Lithuania',
+				'LU' => 'Luxembourg',
+				'MT' => 'Malta',
+				'NL' => 'Netherlands',
+				'PL' => 'Poland',
+				'PT' => 'Portugal',
+				'RO' => 'Romania',
+				'SK' => 'Slovakia',
+				'SI' => 'Slovenia',
+				'ES' => 'Spain',
+				'SE' => 'Sweden',
+				'GB' => 'United Kingdom',
+				'ZA' => 'South Africa',
+				//'XX' => 'Unknown',
 			);
 
-			//return apply_filters( 'eu_country_list', $countries );
+			return apply_filters( 'eu_country_list', $countries );
 			return $countries;
+		}
+
+		/**
+		 * Get list of EU Exclusions
+		 * Some territories/areas are not applicable for VAT
+		 *
+		 * @access      public
+		 * @since       1.0
+		 * @param null $country
+		 * @return mixed|void  A list of territories excluded, based on the customer's country
+		 */
+
+		public function eu_get_territory_exclustion_list( $country = null ) {
+
+			if( empty( $country ) )
+				$country = $this->eu_get_ip();
+
+			switch( $country ) :
+
+				// Denmark: Actually these show up as their own countries
+				case 'DK' :
+					$territories = array(
+						'FO' => 'Faroe Islands',
+						'GL' => 'Greenland',
+					);
+				break;
+				// Spain
+				case 'ES' :
+					$territories =  array(
+						'XX' => 'Canary Islands',
+						'XX' => 'Ceuta',
+						'XX' => 'Melilla',
+					);
+				break;
+				// Finland:
+				case 'FI' :
+					$territories =  array(
+						'XX' => 'Åland',
+					);
+				break;
+				// France:
+				case 'FR' :
+					$territories =  array(
+						'XX' => 'Overseas departments, such as Réunion and Guadeloupe',
+					);
+				break;
+				//Germany:
+				case 'DE' :
+					$territories =  array(
+						'XX' => 'Büsingen am Hochrhein',
+						'XX' => 'Heligoland',
+					);
+				break;
+				//Greece:
+				case 'GR' :
+					$territories =  array(
+						'XX' => 'Mount Athos',
+					);
+				break;
+				//Italy:
+				case 'IT' :
+					$territories =  array(
+						'XX' => 'some parts bordering to Switzerland',
+						'XX' => 'Campione d\'Italia',
+						'XX' => 'Livigno',
+						'XX' => 'The Italian waters of Lake Lugano',
+					);
+				break;
+				//Netherlands:
+				case 'NL' :
+					$territories =  array(
+						'XX' => 'Aruba',
+						'XX' => 'Curaçao',
+						'XX' => 'Sint Maarten',
+						'XX' => 'The Caribbean Netherlands',
+					);
+				break;
+				//United Kingdom:
+				case 'UK' :
+					$territories =  array(
+						'XX' => 'Gibraltar',
+						'XX' => 'Channel Islands',
+						'XX' => 'British Overseas Territories',
+					);
+
+			endswitch;
+
+			return apply_filters( 'eu_territory_exclustion_list', $territories );
+
+		}
+
+		/**
+		 * Check if the plugin is active
+		 *
+		 * @since 1.0
+		*/
+		function eu_get_running() {
+
+			global $edd_options;
+
+			// Set the checkbox
+			$checkbox = isset( $edd_options['edd_pceu_checkbox'] ) ? $edd_options['edd_pceu_checkbox'] : '';
+
+			return $checkbox;
+		}
+
+		/**
+		 * Get the user's IP
+		 *
+		 * @since 1.0
+		*/
+		function eu_get_user_ip() {
+
+			if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+				$ip=$_SERVER['HTTP_CLIENT_IP'];
+			} elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+				$ip=$_SERVER['HTTP_X_FORWARDED_FOR'];
+		    } else {
+				$ip=$_SERVER['REMOTE_ADDR'];
+    		}
+
+			return $ip;
+
+		}
+
+		/**
+		 * Get the user's Country
+		 *
+		 * @since 1.0
+		*/
+
+		function eu_get_user_country() {
+
+			if (function_exists('geoip_country_code_by_name')) {
+				// If you have GeoIP installed, it's much easier: http://php.net/manual/en/book.geoip.php
+				$this_country = geoip_country_code_by_name( $this->eu_get_user_ip() );
+			} else {
+				// Otherwise we use HostIP.info which is GPL
+				$this_country = file_get_contents('http://api.hostip.info/country.php?ip=' . $this->eu_get_user_ip() );
+			}
+
+			return $this_country;
 		}
 
 		/**
@@ -149,29 +292,10 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 
 			global $edd_options;
 
-			// Set the checkbox
-			$checkbox = isset( $edd_options['edd_pceu_checkbox'] ) ? $edd_options['edd_pceu_checkbox'] : '';
-
-			if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
-				$ip=$_SERVER['HTTP_CLIENT_IP'];
-			} elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-				$ip=$_SERVER['HTTP_X_FORWARDED_FOR'];
-		    } else {
-				$ip=$_SERVER['REMOTE_ADDR'];
-    		}
-
-			if (function_exists('geoip_country_code_by_name')) {
-				// If you have GeoIP installed, it's much easier: http://php.net/manual/en/book.geoip.php
-				$this_country = geoip_country_code_by_name( $ip );
-			} else {
-				// Otherwise we use HostIP.info which is GPL
-				$this_country = file_get_contents('http://api.hostip.info/country.php?ip=' . $ip );
-			}
-
 			if (
-				$checkbox == TRUE &&
-				$this_country != $edd_options['edd_pceu_exclude'] &&
-				array_key_exists( $this_country, $this->eu_get_country_list() )
+				$this->eu_get_running() == TRUE &&
+				$this->eu_get_user_country() != $edd_options['edd_pceu_exclude'] &&
+				array_key_exists( $this->eu_get_user_country(), $this->eu_get_country_list() )
 			) {
 				$canblock = TRUE;
 			} else {
@@ -219,7 +343,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 		 * Custom Checkout Field
 		 * A confirmation box. In the event someone made it all the way through IP checks
 		 * we STILL need to cover our damn asses and make sure they're not really in the
-		 * EU, so we put the onus on them to confirm "I confirm I do not reside in the EU."
+		 * EU, so we put the onus on them to confirm 'I confirm I do not reside in the EU.'
 		 *
 		 * @since 1.0
 		*/
@@ -231,9 +355,9 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 			$checkbox = isset( $edd_options['edd_pceu_checkbox'] ) ? $edd_options['edd_pceu_checkbox'] : '';
 			if ( $checkbox == TRUE ) {
 				?>
-				<p id="edd-eu-wrap">
-					<label class="edd-label" for="edd-eu"><?php _e('EU VAT Compliance Confirmation', 'edd-prevent-eu-checkout', 'edd-prevent-eu-checkout'); ?></label>
-					<span class="edd-description"><input class="edd-checkbox" type="checkbox" id="edd-eu" value="1" /> <?php _e('By checking this box you confirm you are either a business or not a legal EU resident.', 'edd-prevent-eu-checkout', 'edd-prevent-eu-checkout'); ?></span>
+				<p id='edd-eu-wrap'>
+					<label class='edd-label' for='edd-eu'><?php _e('EU VAT Compliance Confirmation', 'edd-prevent-eu-checkout', 'edd-prevent-eu-checkout'); ?></label>
+					<span class='edd-description'><input class='edd-checkbox' type='checkbox' id='edd-eu' value='1' /> <?php _e('By checking this box you confirm you are either a business or not a legal EU resident.', 'edd-prevent-eu-checkout', 'edd-prevent-eu-checkout'); ?></span>
 				</p>
 				<?php
 			}
@@ -285,7 +409,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 					'name' => __( 'General Message', 'edd-prevent-eu-checkout' ),
 					'desc' => __( 'Will be displayed at the top of every page where [downloads] is used.', 'edd-prevent-eu-checkout' ),
 					'type' => 'textarea',
-					'std' => 'At this time we are unable to complete sales to EU residents. <a href="#">Why?</a>'
+					'std' => 'At this time we are unable to complete sales to EU residents. <a href='#'>Why?</a>'
 				),
 
 				array(
@@ -293,7 +417,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 					'name' => __( 'Checkout Message', 'edd-prevent-eu-checkout' ),
 					'desc' => __( 'Will be displayed on attempt to checkout by someone in the EU.', 'edd-prevent-eu-checkout' ),
 					'type' => 'textarea',
-					'std' => 'At this time we are unable to complete sales to EU residents. <a href="#">Why?</a>'
+					'std' => 'At this time we are unable to complete sales to EU residents. <a href='#'>Why?</a>'
 				),
 
 				array(
@@ -302,12 +426,6 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 					'desc' => __( 'If sales are permitted from your own country, select it from this dropdown. (Invalid countries cannot be selected.)', 'edd-prevent-eu-checkout' ),
 					'type' => 'select',
 					'options' => edd_get_country_list()
-				),
-
-				array(
-					'id' => 'edd_pceu_footnote',
-					'name' => '<a href="http://www.hostip.info">My IP Address Lookup</a>',
-					'type' => 'header'
 				),
 
 			);
@@ -345,10 +463,9 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 			return $input;
 		}
 
-	}
+	} // END CLASS
 
 }
-
 
 /**
  * Get everything running
