@@ -26,7 +26,7 @@ In addition, it adds a *required* checkbox that has the customer confirm they're
 
 == Installation ==
 
-After installation, visit the EDD Extensions page and edit the values for "Prevent EU Checkout"
+After installation, visit the EDD Extensions page and edit the values for "Prevent EU Checkout" as needed.
 
 == Screenshots ==
 

@@ -143,6 +143,9 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 		/**
 		 * Get list of EU Exclusions
 		 * Some territories/areas are not applicable for VAT
+		 * This isn't used yet, and may never be as EDD is planning to add in everyone as a country
+		 * https://github.com/easydigitaldownloads/Easy-Digital-Downloads/issues/2818
+		 * That will mean I can delete and not do a double check.
 		 *
 		 * @access      public
 		 * @since       1.0
@@ -268,7 +271,6 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 		 *
 		 * @since 1.0
 		*/
-
 		function eu_get_user_country() {
 
 			if (function_exists('geoip_country_code_by_name')) {
@@ -368,7 +370,6 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 		 *
 		 * @since 1.0
 		*/
-
 		function validate_custom_fields($valid_data, $data) {
 
 			global $edd_options;
