@@ -107,31 +107,32 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 				'AT' => 'Austria',
 				'BE' => 'Belgium',
 				'BG' => 'Bulgaria',
-				'HR' => 'Croatia',
 				'CY' => 'Republic of Cyprus',
 				'CZ' => 'Czech Republic',
+				'DE' => 'Germany',
 				'DK' => 'Denmark',
 				'EE' => 'Estonia',
+				'EL' => 'Greece', // Shouldn't need both, but just in case
+				'ES' => 'Spain',
 				'FI' => 'Finland',
 				'FR' => 'France',
-				'DE' => 'Germany',
+				'GB' => 'United Kingdom',
 				'GR' => 'Greece',
+				'HR' => 'Croatia',
 				'HU' => 'Hungary',
 				'IE' => 'Ireland',
 				'IT' => 'Italy',
-				'LV' => 'Latvia',
 				'LT' => 'Lithuania',
 				'LU' => 'Luxembourg',
+				'LV' => 'Latvia',
 				'MT' => 'Malta',
 				'NL' => 'Netherlands',
 				'PL' => 'Poland',
 				'PT' => 'Portugal',
 				'RO' => 'Romania',
-				'SK' => 'Slovakia',
-				'SI' => 'Slovenia',
-				'ES' => 'Spain',
 				'SE' => 'Sweden',
-				'GB' => 'United Kingdom',
+				'SI' => 'Slovenia',
+				'SK' => 'Slovakia',
 				'ZA' => 'South Africa',
 				//'XX' => 'Unknown',
 			);
@@ -143,9 +144,6 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 		/**
 		 * Get list of EU Exclusions
 		 * Some territories/areas are not applicable for VAT
-		 * This isn't used yet, and may never be as EDD is planning to add in everyone as a country
-		 * https://github.com/easydigitaldownloads/Easy-Digital-Downloads/issues/2818
-		 * That will mean I can delete and not do a double check.
 		 *
 		 * @access      public
 		 * @since       1.0
@@ -160,7 +158,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 
 			switch( $country ) :
 
-				// Denmark: Actually these show up as their own countries
+				// Denmark:
 				case 'DK' :
 					$territories = array(
 						'FO' => 'Faroe Islands',
@@ -170,60 +168,63 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 				// Spain
 				case 'ES' :
 					$territories =  array(
-						'XX' => 'Canary Islands',
-						'XX' => 'Ceuta',
-						'XX' => 'Melilla',
+						'ES' => 'Canary Islands',
+						'ES' => 'Ceuta',
+						'ES' => 'Melilla',
 					);
 				break;
 				// Finland:
 				case 'FI' :
 					$territories =  array(
-						'XX' => 'Åland',
+						'AX' => '&#197;land Islands',
 					);
 				break;
 				// France:
 				case 'FR' :
 					$territories =  array(
-						'XX' => 'Overseas departments, such as Réunion and Guadeloupe',
+						'RE' => 'Réunion',
+						'GP' => 'Guadeloupe',
+						'MF' => 'Saint Martin (French part)',
+						'FR' => 'Overseas departments',
 					);
 				break;
 				//Germany:
 				case 'DE' :
 					$territories =  array(
-						'XX' => 'Büsingen am Hochrhein',
-						'XX' => 'Heligoland',
+						'DE' => 'Büsingen am Hochrhein',
+						'DE' => 'Heligoland',
 					);
 				break;
 				//Greece:
 				case 'GR' :
 					$territories =  array(
-						'XX' => 'Mount Athos',
+						'DE' => 'Mount Athos',
 					);
 				break;
 				//Italy:
 				case 'IT' :
 					$territories =  array(
-						'XX' => 'some parts bordering to Switzerland',
-						'XX' => 'Campione d\'Italia',
-						'XX' => 'Livigno',
-						'XX' => 'The Italian waters of Lake Lugano',
+						'IT' => 'some parts bordering to Switzerland',
+						'IT' => 'Campione d\'Italia',
+						'IT' => 'Livigno',
+						'IT' => 'The Italian waters of Lake Lugano',
 					);
 				break;
 				//Netherlands:
 				case 'NL' :
 					$territories =  array(
-						'XX' => 'Aruba',
-						'XX' => 'Curaçao',
-						'XX' => 'Sint Maarten',
-						'XX' => 'The Caribbean Netherlands',
+						'AW' => 'Aruba',
+						'CW' => 'Curaçao',
+						'SX' => 'Saint Martin (Dutch part)',
+						'NL' => 'The Caribbean Netherlands',
 					);
 				break;
 				//United Kingdom:
 				case 'UK' :
 					$territories =  array(
-						'XX' => 'Gibraltar',
-						'XX' => 'Channel Islands',
-						'XX' => 'British Overseas Territories',
+						'GI' => 'Gibraltar',
+						'NL' => 'Channel Islands',
+						'NL' => 'British Overseas Territories',
 					);
 
 			endswitch;
