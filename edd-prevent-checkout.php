@@ -63,7 +63,10 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 			add_action( 'init', array( $this, 'textdomain' ) );
 
 			// show error before purchase form
-			add_action( 'edd_before_purchase_form', array( $this, 'set_error' ) );
+			add_action( 'edd_before_purchase_form', array( $this, 'set_checkout_error' ) );
+
+			// show message when [downloads] is called
+			add_action( 'the_content', array( $this, 'set_downloads_message' )  );
 
 			// prevent form from being loaded
 			add_filter( 'edd_can_checkout',  array( $this, 'can_checkout' ) );
@@ -134,7 +137,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 				'SI' => 'Slovenia',
 				'SK' => 'Slovakia',
 				'ZA' => 'South Africa',
-				'XX' => 'Unknown',
+				//'XX' => 'Unknown',
 			);
 
 			return apply_filters( 'eu_country_list', $countries );
@@ -305,7 +308,12 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 
 		/**
 		 * Check if restrictions need to be applied
-		 * If the checkbox is true and the country is on the list, we block
+		 *
+		 * Returns true if the following are also true
+		 * 1) Checkbox is check
+		 * 2) Dates are now or later
+		 * 3) User country is NOT excluded
+		 * 4) User country IS on the list
 		 *
 		 * @since 1.0
 		*/
@@ -349,7 +357,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 		 *
 		 * @since 1.0
 		*/
-		function set_error() {
+		function set_checkout_error() {
 
 			global $edd_options;
 
@@ -361,6 +369,30 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 			}
 
 			edd_print_errors();
+		}
+
+		/**
+		 * Conditionally add a message to content if [downloads] is loaded
+		 *
+		 * @param  string  $content
+		 * @return string
+		 *
+		 * @since 1.0
+		*/
+		function set_downloads_message( $content ) {
+
+			global $edd_options;
+
+			$error = '<div class="edd_errors"><p class="edd_error" id="edd_error_no_eu">'.$edd_options['edd_pceu_general_message'].'</p></div>';
+
+			if (
+				$this->block_eu_required() == TRUE &&
+				( is_singular( 'download' ) || has_shortcode( $content, 'downloads' ) || has_shortcode( $content, 'purchase_link' ) )
+			) {
+				return $error . $content;
+			} else {
+				return $content;
+			}
 		}
 
 		/**
@@ -430,7 +462,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 				array(
 					'id' => 'edd_pceu_general_message',
 					'name' => __( 'General Message', 'edd-prevent-eu-checkout' ),
-					'desc' => __( 'Will be displayed at the top of every page where [downloads] is used.', 'edd-prevent-eu-checkout' ),
+					'desc' => __( 'Will be displayed at the top of every page where downloads are shown.', 'edd-prevent-eu-checkout' ),
 					'type' => 'textarea',
 					'std' => 'At this time we are unable to complete sales to EU residents. <a href='#'>Why?</a>'
 				),
