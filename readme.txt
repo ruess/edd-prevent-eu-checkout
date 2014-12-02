@@ -56,7 +56,7 @@ It checks their IP address against GeoIP (if installed with your PHP) and then a
 
 = What if that's wrong? =
 
-That's why there's a checkbox added to checkout to have the user confirm they're *not* in the EU.
+IPs aren't perfect, I know. That's why there's a checkbox added to checkout to have the user confirm they're *not* in the EU.
 
 = What if they lie? =
 
