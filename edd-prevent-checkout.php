@@ -134,7 +134,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 				'SI' => 'Slovenia',
 				'SK' => 'Slovakia',
 				'ZA' => 'South Africa',
-				//'XX' => 'Unknown',
+				'XX' => 'Unknown',
 			);
 
 			return apply_filters( 'eu_country_list', $countries );
@@ -286,6 +286,24 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 		}
 
 		/**
+		 * Jan 1 2015 or later?
+		 * Checks to make sure it's time to envoke this plugin.
+		 *
+		 * @since 1.0
+		*/
+		function eu_get_dates() {
+
+			$baddates = false;
+
+			if( time() > strtotime("01-01-2015") ) {
+				$baddates = true;
+			}
+
+			return $baddates;
+
+		}
+
+		/**
 		 * Check if restrictions need to be applied
 		 * If the checkbox is true and the country is on the list, we block
 		 *
@@ -295,17 +313,35 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 
 			global $edd_options;
 
+			$canblock = FALSE;
+
 			if (
 				$this->eu_get_running() == TRUE &&
+				$this->eu_get_dates() == TRUE &&
 				$this->eu_get_user_country() != $edd_options['edd_pceu_exclude'] &&
 				array_key_exists( $this->eu_get_user_country(), $this->eu_get_country_list() )
 			) {
 				$canblock = TRUE;
-			} else {
-				$canblock = FALSE;
 			}
 
 			return $canblock;
+		}
+
+		/**
+		 * Can checkout?
+		 * Prevents the form from being displayed at all until the user's IP is outside the EU
+		 *
+		 * @since 1.0
+		*/
+		function can_checkout( $can_checkout  ) {
+
+			$can_checkout = true;
+
+			if ( $this->block_eu_required() == TRUE ) {
+				$can_checkout = false;
+			}
+
+			return $can_checkout;
 		}
 
 		/**
@@ -325,21 +361,6 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 			}
 
 			edd_print_errors();
-		}
-
-		/**
-		 * Can checkout?
-		 * Prevents the form from being displayed at all until the user's IP is outside the EU
-		 *
-		 * @since 1.0
-		*/
-		function can_checkout( $can_checkout  ) {
-
-			if ( $this->block_eu_required() == TRUE ) {
-				$can_checkout = false;
-			}
-
-			return $can_checkout;
 		}
 
 		/**
