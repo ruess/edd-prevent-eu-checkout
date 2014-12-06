@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: EDD - Prevent Checkout for the EU
-Plugin URI:
+Plugin URI: https://github.com/Ipstenu/edd-prevent-eu-checkout
 Description: Prevents customer from being able to checkout if they're from the EU because VAT laws are stupid.
 Version: 1.0-BETA
 Author: Andrew Munro (Sumobi), Mika A. Epstein (Ipstenu)
@@ -13,7 +13,10 @@ Forked from http://sumobi.com/shop/edd-prevent-checkout/
 */
 
 // Exit if accessed directly
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) { wp_die( __( 'Cheatin&#8217; uh?' ) ); }
+
+// Exit if EDD isn't active
+if ( class_exists( 'Easy_Digital_Downloads' ) ) { wp_die( __( 'This plugin requires you to have Easy Digital Downloads installed and active.' ) ); }
 
 if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 
