@@ -50,6 +50,10 @@ The easiest solution for most small business is to simply stop offering their pr
 
 You hire a lawyer and let them sort it out. I'm not a lawyer. I'm not even sure if I need this.
 
+= Isn't this illegal in the UK? =
+
+I don't know. Again, not a lawyer. Ask one.
+
 = How does it know if someone is in the EU? =
 
 It checks their IP address against GeoIP (if installed with your PHP) and then against http://www.hostip.info
