@@ -66,8 +66,9 @@ Then they broke the law, not you.
 
 Everyone in the EU (Austria, Belgium, Bulgaria, Croatia, Republic of Cyprus, Czech Republic, Denmark, Estonia, Finland, France, Germany, Greece, Hungary, Ireland, Italy, Latvia, Lithuania, Luxembourg, Malta, Netherlands, Poland, Portugal, Romania, Slovakia, Slovenia, Spain, Sweden and the UK) plus South Africa.
 
-
 ## Changelog ##
+
+~Current Version:1.0~
 
 ### 1.0 ###
 * Initial release
