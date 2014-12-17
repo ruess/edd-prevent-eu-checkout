@@ -3,7 +3,7 @@
 Plugin Name: EDD - Prevent Checkout for the EU
 Plugin URI: https://github.com/Ipstenu/edd-prevent-eu-checkout
 Description: Prevents customer from being able to checkout if they're from the EU because VAT laws are stupid.
-Version: 1.0-BETA
+Version: 1.0
 Author: Andrew Munro (Sumobi), Mika A. Epstein (Ipstenu)
 Author URI: http://sumobi.com/
 License: GPL-2.0+
