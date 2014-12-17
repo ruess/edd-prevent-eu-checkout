@@ -20,27 +20,6 @@ if ( ! defined( 'ABSPATH' ) ) { wp_die( __( 'Cheatin&#8217; uh?' ) ); }
 // Exit if EDD isn't active
 if ( !class_exists( 'Easy_Digital_Downloads' ) ) { wp_die( __( 'This plugin requires you to have Easy Digital Downloads installed and active.' ) ); }
 
-/* Call the updater */
-
-include_once('updater.php');
-
-if ( is_admin() ) { // note the use of is_admin() to double check that this is happening in the admin
-        $config = array(
-            'slug' => plugin_basename(__FILE__), // this is the slug of your plugin
-            'proper_folder_name' => 'edd-prevent-eu-checkout', // this is the name of the folder your plugin lives in
-            'api_url' => 'https://api.github.com/repos/Ipstenu/edd-prevent-eu-checkout', // the GitHub API url of your GitHub repo
-            'raw_url' => 'https://raw.github.com/Ipstenu/edd-prevent-eu-checkout/master', // the GitHub raw url of your GitHub repo
-            'github_url' => 'https://github.com/Ipstenu/edd-prevent-eu-checkout', // the GitHub url of your GitHub repo
-            'zip_url' => 'https://github.com/Ipstenu/edd-prevent-eu-checkout/zipball/master', // the zip url of the GitHub repo
-            'sslverify' => true, // whether WP should check the validity of the SSL cert when getting an update, see https://github.com/jkudish/WordPress-GitHub-Plugin-Updater/issues/2 and https://github.com/jkudish/WordPress-GitHub-Plugin-Updater/issues/4 for details
-            'requires' => '4.0', // which version of WordPress does your plugin require?
-            'tested' => '4.1', // which version of WordPress is your plugin tested up to?
-            'readme' => 'README.md', // which file to use as the readme for the version number
-            'access_token' => '', // Access private repositories by authorizing under Appearance > GitHub Updates when this example plugin is installed
-        );
-        new WP_GitHub_Updater($config);
-    }
-
 /* The Acutal Plugin */
 
 if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
