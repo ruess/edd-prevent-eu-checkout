@@ -17,19 +17,6 @@ Forked from http://sumobi.com/shop/edd-prevent-checkout/
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) { wp_die( __( 'Cheatin&#8217; uh?' ) ); }
 
-// Exit if EDD isn't active
-if ( !class_exists( 'Easy_Digital_Downloads' ) ) {
-	 add_action( 'admin_notices', 'edd_prevent_eu_checkout_admin_notice' );
-}
-
-function edd_prevent_eu_checkout_admin_notice() {
-    ?>
-    <div class="error">
-        <p><?php _e( 'EDD Prevent EU Checkout cannot run without EDD installed.', 'edd-prevent-eu-checkout' ); ?></p>
-    </div>
-    <?php
-}
-
 /* The Acutal Plugin */
 
 if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
@@ -547,7 +534,23 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
  * @access private
  * @return void
  */
+
+if ( !class_exists( 'Easy_Digital_Downloads' ) ) {
+	// We can't activate so let's throw a warning
+	 add_action( 'admin_notices', 'edd_prevent_eu_checkout_admin_notice' );
+} else {
+	// We can load! Let's do this thing!
+	add_action( 'plugins_loaded', 'edd_prevent_eu_checkout_load' );
+}
+
+function edd_prevent_eu_checkout_admin_notice() {
+    ?>
+    <div class="error">
+        <p><?php _e( 'EDD Prevent EU Checkout cannot run without EDD installed.', 'edd-prevent-eu-checkout' ); ?></p>
+    </div>
+    <?php
+}
+
 function edd_prevent_eu_checkout_load() {
 	$edd_prevent_checkout = new EDD_Prevent_EU_Checkout();
 }
-add_action( 'plugins_loaded', 'edd_prevent_eu_checkout_load' );
