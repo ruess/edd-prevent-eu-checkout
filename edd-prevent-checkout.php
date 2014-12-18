@@ -18,7 +18,17 @@ Forked from http://sumobi.com/shop/edd-prevent-checkout/
 if ( ! defined( 'ABSPATH' ) ) { wp_die( __( 'Cheatin&#8217; uh?' ) ); }
 
 // Exit if EDD isn't active
-if ( !class_exists( 'Easy_Digital_Downloads' ) ) { wp_die( __( 'This plugin requires you to have Easy Digital Downloads installed and active.' ) ); }
+if ( !class_exists( 'Easy_Digital_Downloads' ) ) {
+	 add_action( 'admin_notices', 'edd_prevent_eu_checkout_admin_notice' );
+}
+
+function edd_prevent_eu_checkout_admin_notice() {
+    ?>
+    <div class="error">
+        <p><?php _e( 'EDD Prevent EU Checkout cannot run without EDD installed.', 'edd-prevent-eu-checkout' ); ?></p>
+    </div>
+    <?php
+}
 
 /* The Acutal Plugin */
 
