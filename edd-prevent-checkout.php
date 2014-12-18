@@ -3,7 +3,7 @@
 Plugin Name: EDD - Prevent Checkout for the EU
 Plugin URI: https://github.com/Ipstenu/edd-prevent-eu-checkout
 Description: Prevents customer from being able to checkout if they're from the EU because VAT laws are stupid.
-Version: 1.0.1
+Version: 1.0.2
 Author: Andrew Munro (Sumobi), Mika A. Epstein (Ipstenu)
 Author URI: http://sumobi.com/
 License: GPL-2.0+
@@ -300,10 +300,10 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 		*/
 		function eu_get_dates() {
 
-			$baddates = false;
+			$baddates = FALSE;
 
-			if( time() > strtotime("01-01-2015") ) {
-				$baddates = true;
+			if( strtotime("01/01/2015") <= time() ) {
+				$baddates = TRUE;
 			}
 
 			return $baddates;
@@ -347,10 +347,10 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 		*/
 		function can_checkout( $can_checkout  ) {
 
-			$can_checkout = true;
+			$can_checkout = TRUE;
 
 			if ( $this->block_eu_required() == TRUE ) {
-				$can_checkout = false;
+				$can_checkout = FALSE;
 			}
 
 			return $can_checkout;
@@ -407,17 +407,14 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 		 *
 		 * @since 1.0
 		*/
-
 		function custom_checkout_fields() {
 
-			global $edd_options;
-
-			$checkbox = isset( $edd_options['edd_pceu_checkbox'] ) ? $edd_options['edd_pceu_checkbox'] : '';
-			if ( $checkbox == TRUE ) {
+			// If the plugin is running and the dates are okay
+			if ( $this->eu_get_running() == TRUE && $this->eu_get_dates() == TRUE ) {
 				?>
 				<p id='edd-eu-wrap'>
 					<label class='edd-label' for='edd-eu'><?php _e('EU VAT Compliance Confirmation', 'edd-prevent-eu-checkout', 'edd-prevent-eu-checkout'); ?></label>
-					<span class='edd-description'><input class='edd-checkbox' type='checkbox' id='edd-eu' value='1' /> <?php _e('By checking this box you confirm you are either a business or not a legal EU resident.', 'edd-prevent-eu-checkout', 'edd-prevent-eu-checkout'); ?></span>
+					<span class='edd-description'><input class='edd-checkbox' type='checkbox' name='edd_eu' id='edd-eu' value='1' /> <?php _e('By checking this box you confirm you are either a business or not a legal EU resident.', 'edd-prevent-eu-checkout', 'edd-prevent-eu-checkout'); ?></span>
 				</p>
 				<?php
 			}

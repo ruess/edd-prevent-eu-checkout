@@ -76,6 +76,9 @@ The code won't run until Jan 1, 2015, based on your blog's internal chronometer.
 
 == Changelog ==
 
+= 1.0.2 =
+* Dates were wrong. You're supposed to CHECK if it's before or after Jan 1, 2015... TARDIS.
+
 = 1.0.1 =
 * '/" mixup (thanks @macmanx)
 * Better handling of failures.
