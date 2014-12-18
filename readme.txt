@@ -78,6 +78,7 @@ The code won't run until Jan 1, 2015, based on your blog's internal chronometer.
 
 = 1.0.1 =
 * '/" mixup (thanks @macmanx)
+* Better handling of failures.
 
 = 1.0 =
 * Initial release
