@@ -1,10 +1,10 @@
-=== EDD - Sucks to be EU ===
+=== EDD - Prevent EU Checkout ===
 Contributors: Ipstenu
 Donate link: https://store.halfelf.org/donate/
 Tags: easy digital downloads, edd, purchase, prevent, checkout, e-commerce, eu, VAT
 Requires at least: 3.3
-Tested up to: 4.0.1
-Stable tag: 1.0
+Tested up to: 4.1
+Stable tag: 1.0.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -70,7 +70,14 @@ Then they broke the law, not you.
 
 Everyone in the EU (Austria, Belgium, Bulgaria, Croatia, Republic of Cyprus, Czech Republic, Denmark, Estonia, Finland, France, Germany, Greece, Hungary, Ireland, Italy, Latvia, Lithuania, Luxembourg, Malta, Netherlands, Poland, Portugal, Romania, Slovakia, Slovenia, Spain, Sweden and the UK) plus South Africa.
 
+= Why isn't this working? =
+
+The code won't run until Jan 1, 2015, based on your blog's internal chronometer. Until then, sell away!
+
 == Changelog ==
+
+= 1.0.1 =
+* '/" mixup (thanks @macmanx)
 
 = 1.0 =
 * Initial release

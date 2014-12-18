@@ -3,7 +3,7 @@
 Plugin Name: EDD - Prevent Checkout for the EU
 Plugin URI: https://github.com/Ipstenu/edd-prevent-eu-checkout
 Description: Prevents customer from being able to checkout if they're from the EU because VAT laws are stupid.
-Version: 1.0
+Version: 1.0.1
 Author: Andrew Munro (Sumobi), Mika A. Epstein (Ipstenu)
 Author URI: http://sumobi.com/
 License: GPL-2.0+
@@ -471,7 +471,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 					'name' => __( 'General Message', 'edd-prevent-eu-checkout' ),
 					'desc' => __( 'Will be displayed at the top of every page where downloads are shown.', 'edd-prevent-eu-checkout' ),
 					'type' => 'textarea',
-					'std' => 'At this time we are unable to complete sales to EU residents. <a href='#'>Why?</a>'
+					'std' => 'At this time we are unable to complete sales to EU residents. <a href="#">Why?</a>'
 				),
 
 				array(
@@ -479,7 +479,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 					'name' => __( 'Checkout Message', 'edd-prevent-eu-checkout' ),
 					'desc' => __( 'Will be displayed on attempt to checkout by someone in the EU.', 'edd-prevent-eu-checkout' ),
 					'type' => 'textarea',
-					'std' => 'At this time we are unable to complete sales to EU residents. <a href='#'>Why?</a>'
+					'std' => 'At this time we are unable to complete sales to EU residents. <a href="#">Why?</a>'
 				),
 
 				array(
