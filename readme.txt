@@ -4,7 +4,7 @@ Donate link: https://store.halfelf.org/donate/
 Tags: easy digital downloads, edd, purchase, prevent, checkout, e-commerce, eu, VAT
 Requires at least: 3.3
 Tested up to: 4.1
-Stable tag: 1.0.1
+Stable tag: 1.0.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -75,6 +75,9 @@ Everyone in the EU (Austria, Belgium, Bulgaria, Croatia, Republic of Cyprus, Cze
 The code won't run until Jan 1, 2015, based on your blog's internal chronometer. Until then, sell away!
 
 == Changelog ==
+
+= 1.0.3 =
+* Small date check improvement on checkout.
 
 = 1.0.2 =
 * Dates were wrong. You're supposed to CHECK if it's before or after Jan 1, 2015... TARDIS.

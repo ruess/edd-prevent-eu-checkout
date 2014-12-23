@@ -24,7 +24,10 @@ In addition, it adds a *required* checkbox that has the customer confirm they're
 
 ## Changelog ##
 
-~Current Version:1.0.2~
+~Current Version:1.0.3~
+
+### 1.0.3 ###
+* Small date check improvement on checkout.
 
 ### 1.0.2 ###
 * Dates were wrong. You're supposed to CHECK if it's before or after Jan 1, 2015... TARDIS.
