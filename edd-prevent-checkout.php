@@ -1,9 +1,9 @@
 <?php
 /*
 Plugin Name: EDD - Prevent Checkout for the EU
-Plugin URI: http://halfelf.org/edd-prevent-eu-checkout
+Plugin URI: https://github.com/Ipstenu/edd-prevent-eu-checkout
 Description: Prevents customer from being able to checkout if they're from the EU because VAT laws are stupid.
-Version: 1.0.4
+Version: 1.0.5
 Author: Andrew Munro (Sumobi), Mika A. Epstein (Ipstenu)
 Author URI: http://sumobi.com/
 License: GPL-2.0+
@@ -145,6 +145,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 				'SK' => 'Slovakia',
 				//'ZA' => 'South Africa', # Per http://www.kpmg.com/global/en/issuesandinsights/articlespublications/vat-gst-essentials/pages/south-africa.aspx the threshold is R50,000
 				//'XX' => 'Unknown', # This is for localhost testing
+				'US' => 'USA for testing',
 			);
 
 			return apply_filters( 'eu_country_list', $countries );
@@ -291,6 +292,13 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 			} else {
 				// Otherwise we use HostIP.info which is GPL
 				$this_country = file_get_contents('http://api.hostip.info/country.php?ip=' . $this->eu_get_user_ip() );
+
+				if ( $this_country = "XX" ) {
+					// If HostIP comes up as XX then it doesn't know who you are, so we'll ask mediawiki
+					$wikijson = substr( file_get_contents('http://geoiplookup.wikimedia.org/'), 5);
+					$wikijsonarray = json_decode($json, true);
+					$this_country = $wikijsonarray['country'];
+				}
 			}
 
 			return $this_country;
