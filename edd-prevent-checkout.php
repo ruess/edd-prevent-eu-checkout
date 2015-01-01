@@ -1,9 +1,9 @@
 <?php
 /*
 Plugin Name: EDD - Prevent Checkout for the EU
-Plugin URI: https://github.com/Ipstenu/edd-prevent-eu-checkout
+Plugin URI: http://halfelf.org/edd-prevent-eu-checkout
 Description: Prevents customer from being able to checkout if they're from the EU because VAT laws are stupid.
-Version: 1.0.3
+Version: 1.0.4
 Author: Andrew Munro (Sumobi), Mika A. Epstein (Ipstenu)
 Author URI: http://sumobi.com/
 License: GPL-2.0+
@@ -15,7 +15,7 @@ Forked from http://sumobi.com/shop/edd-prevent-checkout/
 /* Preflight checklist */
 
 // Exit if accessed directly
-if ( ! defined( 'ABSPATH' ) ) { wp_die( __( 'Cheatin&#8217; uh?' ) ); }
+if ( ! defined( 'ABSPATH' ) ) { wp_die( __( 'Cheatin&#8217; eh?' ) ); }
 
 /* The Acutal Plugin */
 
@@ -73,7 +73,10 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 			add_action( 'the_content', array( $this, 'set_downloads_message' )  );
 
 			// prevent form from being loaded
-			add_filter( 'edd_can_checkout',  array( $this, 'can_checkout' ) );
+			add_filter( 'edd_can_checkout', array( $this, 'can_checkout' ) );
+
+			// prevent Buy Now button from displaying
+			add_filter( 'edd_purchase_download_form', array( $this, 'prevent_purchase_button' ), 10, 2 );
 
 			// add settings
 			add_filter( 'edd_settings_extensions', array( $this, 'settings' ) );
@@ -119,7 +122,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 				'DE' => 'Germany',
 				'DK' => 'Denmark',
 				'EE' => 'Estonia',
-				'EL' => 'Greece', // Shouldn't need both, but just in case
+				'EL' => 'Greece', # Shouldn't need both, but just in case
 				'ES' => 'Spain',
 				'FI' => 'Finland',
 				'FR' => 'France',
@@ -140,8 +143,8 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 				'SE' => 'Sweden',
 				'SI' => 'Slovenia',
 				'SK' => 'Slovakia',
-				'ZA' => 'South Africa',
-				//'XX' => 'Unknown',
+				//'ZA' => 'South Africa', # Per http://www.kpmg.com/global/en/issuesandinsights/articlespublications/vat-gst-essentials/pages/south-africa.aspx the threshold is R50,000
+				//'XX' => 'Unknown', # This is for localhost testing
 			);
 
 			return apply_filters( 'eu_country_list', $countries );
@@ -151,6 +154,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 		/**
 		 * Get list of EU Exclusions
 		 * Some territories/areas are not applicable for VAT
+		 * This function is NOT YET being used.
 		 *
 		 * @access      public
 		 * @since       1.0
@@ -400,6 +404,23 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 		}
 
 		/**
+		 * Customize purchase button
+		 * In order to prevent the Buy Now stuff from working, we're going to go
+		 * hard core and just block it entirely.
+		 *
+		 * @since 1.0.4
+		*/
+		function prevent_purchase_button( $content, $args) {
+
+			global $edd_options;
+
+			if ( $this->block_eu_required() == TRUE ) {
+				$content = '<p><a href="#" class="button '. $args['color'] .' edd-submit">'. $edd_options['edd_pceu_button_message'] .'</a></p>';
+			}
+			return $content;
+		}
+
+		/**
 		 * Custom Checkout Field
 		 * A confirmation box. In the event someone made it all the way through IP checks
 		 * we STILL need to cover our damn asses and make sure they're not really in the
@@ -429,7 +450,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 
 			if ( $this->eu_get_running() == TRUE && $this->eu_get_dates() == TRUE ) {
 				global $edd_options;
-	
+
 				if ( !isset( $data['edd_eu'] ) || $data['edd_eu'] != '1' ) {
 					$data['edd_eu'] = 0;
 					edd_set_error( 'eu_not_checked', apply_filters( 'edd_pceu_error_message', $edd_options['edd_pceu_checkout_message'] ) );
@@ -464,15 +485,23 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 				array(
 					'id' => 'edd_pceu_general_message',
 					'name' => __( 'General Message', 'edd-prevent-eu-checkout' ),
-					'desc' => __( 'Will be displayed at the top of every page where downloads are shown.', 'edd-prevent-eu-checkout' ),
+					'desc' => __( 'Will be displayed at the top of every page where downloads are shown. HTML is accepted.', 'edd-prevent-eu-checkout' ),
 					'type' => 'textarea',
 					'std' => 'At this time we are unable to complete sales to EU residents. <a href="#">Why?</a>'
 				),
 
 				array(
+					'id' => 'edd_pceu_button_message',
+					'name' => __( 'Button Content', 'edd-prevent-eu-checkout' ),
+					'desc' => __( '<br />Will be displayed in lieu of "Add to Cart" or "Buy Now" buttons. Keep it short.', 'edd-prevent-eu-checkout' ),
+					'type' => 'text',
+					'std' => 'Purchase unavailable in your country'
+				),
+
+				array(
 					'id' => 'edd_pceu_checkout_message',
 					'name' => __( 'Checkout Message', 'edd-prevent-eu-checkout' ),
-					'desc' => __( 'Will be displayed on attempt to checkout by someone in the EU.', 'edd-prevent-eu-checkout' ),
+					'desc' => __( 'Will be displayed on attempt to checkout. HTML is accepted.', 'edd-prevent-eu-checkout' ),
 					'type' => 'textarea',
 					'std' => 'At this time we are unable to complete sales to EU residents. <a href="#">Why?</a>'
 				),
@@ -480,7 +509,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 				array(
 					'id' => 'edd_pceu_exclude',
 					'name' => __( 'Exclude Country', 'edd-prevent-eu-checkout' ),
-					'desc' => __( 'If sales are permitted from your own country, select it from this dropdown. (Invalid countries cannot be selected.)', 'edd-prevent-eu-checkout' ),
+					'desc' => __( '<br />If sales are permitted from your own country, select it from this dropdown.', 'edd-prevent-eu-checkout' ),
 					'type' => 'select',
 					'options' => edd_get_country_list()
 				),
@@ -507,6 +536,9 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 			// Sanitize edd_pceu_general_message
 			$input['edd_pceu_general_message'] = wp_kses_post( $input['edd_pceu_general_message'] );
 
+			// Sanitize edd_pceu_button_message
+			$input['edd_pceu_button_message'] = sanitize_text_field( $input['edd_pceu_button_message'] );
+
 			// Sanitize edd_pceu_checkout_message
 			$input['edd_pceu_checkout_message'] = wp_kses_post( $input['edd_pceu_checkout_message'] );
 
@@ -514,7 +546,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 			if ( in_array($input['edd_pceu_exclude'], $this->eu_get_country_list()) || array_key_exists($input['edd_pceu_exclude'], $this->eu_get_country_list()) ) {
 				$input['edd_pceu_exclude'] = $input['edd_pceu_exclude'];
 			} else {
-				$input['edd_pceu_exclude'] = null;
+				//$input['edd_pceu_exclude'] = null;
 			}
 
 			return $input;
