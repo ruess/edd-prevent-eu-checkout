@@ -3,7 +3,7 @@
 Plugin Name: EDD - Prevent Checkout for the EU
 Plugin URI: https://github.com/Ipstenu/edd-prevent-eu-checkout
 Description: Prevents customer from being able to checkout if they're from the EU because VAT laws are stupid.
-Version: 1.0.4
+Version: 1.0.5
 Author: Andrew Munro (Sumobi), Mika A. Epstein (Ipstenu)
 Author URI: http://sumobi.com/
 License: GPL-2.0+
@@ -17,7 +17,15 @@ Forked from http://sumobi.com/shop/edd-prevent-checkout/
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) { wp_die( __( 'Cheatin&#8217; eh?' ) ); }
 
-/* The Acutal Plugin */
+/**
+ * Call the GeoIP reader code
+ *
+ * @since 1.0.5
+ */
+require_once 'GeoIP/vendor/autoload.php';
+use GeoIp2\Database\Reader;
+
+/* The Actual Plugin */
 
 if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 
@@ -74,7 +82,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 
 			// prevent form from being loaded
 			add_filter( 'edd_can_checkout', array( $this, 'can_checkout' ) );
-			
+
 			// prevent Buy Now button from displaying
 			add_filter( 'edd_purchase_download_form', array( $this, 'prevent_purchase_button' ), 10, 2 );
 
@@ -144,7 +152,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 				'SI' => 'Slovenia',
 				'SK' => 'Slovakia',
 				//'ZA' => 'South Africa', # Per http://www.kpmg.com/global/en/issuesandinsights/articlespublications/vat-gst-essentials/pages/south-africa.aspx the threshold is R50,000
-				//'XX' => 'Unknown', # This is for localhost testing
+				// 'XX' => 'Unknown', # This is for testing only.
 			);
 
 			return apply_filters( 'eu_country_list', $countries );
@@ -288,9 +296,35 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 			if (function_exists('geoip_country_code_by_name')) {
 				// If you have GeoIP installed, it's much easier: http://php.net/manual/en/book.geoip.php
 				$this_country = geoip_country_code_by_name( $this->eu_get_user_ip() );
+			} elseif ( file_exists( WP_CONTENT_DIR . '/edd-pec-geoip/GeoLite2-Country.mmdb' ) ) {
+				try {
+					$reader = new Reader( WP_CONTENT_DIR . '/edd-pec-geoip/GeoLite2-Country.mmdb' );
+					$record = $reader->country( $this->eu_get_user_ip() );
+					$this_country = $record->country->isoCode;
+				} catch (Exception $e) {
+					// If the IP isn't listed here, we have to do this
+					$this_country = "XX";
+				}				
 			} else {
-				// Otherwise we use HostIP.info which is GPL
+				// Otherwise we use HostIP.info which is GPL (results in XX if country does not exist)
 				$this_country = file_get_contents('http://api.hostip.info/country.php?ip=' . $this->eu_get_user_ip() );
+			}
+
+			// Hail Mary Pass - if we've failed all around and gotten an XX, we'll try wikipedia. 
+			if ( $this_country == "XX" ) {
+				try {
+					$wikijson = substr( file_get_contents('http://geoiplookup.wikimedia.org/'), 5);
+					$wikijsonarray = json_decode($wikijson, true);
+					$this_country = $wikijsonarray['country'];
+				} catch (Exception $e) {
+					// If this failed, lets set to 00 and carry on.
+					$this_country = "00";
+				}
+			}
+			
+			if ( is_null( $this_country ) ) {
+				// If nothing got set for whatever reason, we force 00
+				$this_country = "00";
 			}
 
 			return $this_country;
@@ -406,17 +440,22 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 		/**
 		 * Customize purchase button
 		 * In order to prevent the Buy Now stuff from working, we're going to go
-		 * hard core and just block it entirely. 
+		 * hard core and just block it entirely.
 		 *
 		 * @since 1.0.4
 		*/
 		function prevent_purchase_button( $content, $args) {
-			
+
 			global $edd_options;
-			
+
 			if ( $this->block_eu_required() == TRUE ) {
 				$content = '<p><a href="#" class="button '. $args['color'] .' edd-submit">'. $edd_options['edd_pceu_button_message'] .'</a></p>';
 			}
+			
+			if ( ( $this->eu_get_user_country() == "00" || $this->eu_get_user_country() == "XX" ) && $args['direct'] != FALSE ) {
+				$content = '<p><a href="#" class="button '. $args['color'] .' edd-submit">'. $edd_options['edd_pceu_button_message'] .'</a></p>';
+			}
+			
 			return $content;
 		}
 
@@ -450,7 +489,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 
 			if ( $this->eu_get_running() == TRUE && $this->eu_get_dates() == TRUE ) {
 				global $edd_options;
-	
+
 				if ( !isset( $data['edd_eu'] ) || $data['edd_eu'] != '1' ) {
 					$data['edd_eu'] = 0;
 					edd_set_error( 'eu_not_checked', apply_filters( 'edd_pceu_error_message', $edd_options['edd_pceu_checkout_message'] ) );
@@ -538,7 +577,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 
 			// Sanitize edd_pceu_button_message
 			$input['edd_pceu_button_message'] = sanitize_text_field( $input['edd_pceu_button_message'] );
-			
+
 			// Sanitize edd_pceu_checkout_message
 			$input['edd_pceu_checkout_message'] = wp_kses_post( $input['edd_pceu_checkout_message'] );
 

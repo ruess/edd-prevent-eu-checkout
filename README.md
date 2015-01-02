@@ -1,9 +1,11 @@
 # EDD - Sucks to be EU #
 
 **Donate:** https://store.halfelf.org/donate/
+
 **License:** GPLv2 or later  
+
 **License URI:** http://www.gnu.org/licenses/gpl-2.0.html
-  
+
 Prevents customer from being able to checkout if they're from the EU.
 
 [Download on WordPress.org](https://wordpress.org/plugins/edd-prevent-eu-checkout/)
@@ -16,4 +18,4 @@ The official home of the plugin is on WordPress.org as [EDD Prevent EU Checkout]
 
 ## Changelog ##
 
-~Current Version:1.0.4~
+~Current Version:1.0.5~
