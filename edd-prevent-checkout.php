@@ -17,6 +17,14 @@ Forked from http://sumobi.com/shop/edd-prevent-checkout/
 // Exit if accessed directly
 if ( ! defined( 'ABSPATH' ) ) { wp_die( __( 'Cheatin&#8217; eh?' ) ); }
 
+/**
+ * Call the GeoIP reader code
+ *
+ * @since 1.0.5
+ */
+require_once 'GeoIP/vendor/autoload.php';
+use GeoIp2\Database\Reader;
+
 /* The Acutal Plugin */
 
 if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
@@ -144,8 +152,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 				'SI' => 'Slovenia',
 				'SK' => 'Slovakia',
 				//'ZA' => 'South Africa', # Per http://www.kpmg.com/global/en/issuesandinsights/articlespublications/vat-gst-essentials/pages/south-africa.aspx the threshold is R50,000
-				//'XX' => 'Unknown', # This is for localhost testing
-				'US' => 'USA for testing',
+				// 'XX' => 'Unknown', # This is for testing only.
 			);
 
 			return apply_filters( 'eu_country_list', $countries );
@@ -289,16 +296,35 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 			if (function_exists('geoip_country_code_by_name')) {
 				// If you have GeoIP installed, it's much easier: http://php.net/manual/en/book.geoip.php
 				$this_country = geoip_country_code_by_name( $this->eu_get_user_ip() );
+			} elseif ( file_exists( WP_CONTENT_DIR . '/edd-pec-geoip/GeoLite2-Country.mmdb' ) ) {
+				try {
+					$reader = new Reader( WP_CONTENT_DIR . '/edd-pec-geoip/GeoLite2-Country.mmdb' );
+					$record = $reader->country( $this->eu_get_user_ip() );
+					$this_country = $record->country->isoCode;
+				} catch (Exception $e) {
+					// If the IP isn't listed here, we have to do this
+					$this_country = "XX";
+				}				
 			} else {
-				// Otherwise we use HostIP.info which is GPL
+				// Otherwise we use HostIP.info which is GPL (results in XX if country does not exist)
 				$this_country = file_get_contents('http://api.hostip.info/country.php?ip=' . $this->eu_get_user_ip() );
+			}
 
-				if ( $this_country = "XX" ) {
-					// If HostIP comes up as XX then it doesn't know who you are, so we'll ask mediawiki
+			// Hail Mary Pass - if we've failed all around and gotten an XX, we'll try wikipedia. 
+			if ( $this_country == "XX" ) {
+				try {
 					$wikijson = substr( file_get_contents('http://geoiplookup.wikimedia.org/'), 5);
-					$wikijsonarray = json_decode($json, true);
+					$wikijsonarray = json_decode($wikijson, true);
 					$this_country = $wikijsonarray['country'];
+				} catch (Exception $e) {
+					// If this failed, lets set to 00 and carry on.
+					$this_country = "00";
 				}
+			}
+			
+			if ( is_null( $this_country ) ) {
+				// If nothing got set for whatever reason, we force 00
+				$this_country = "00";
 			}
 
 			return $this_country;
@@ -425,6 +451,11 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 			if ( $this->block_eu_required() == TRUE ) {
 				$content = '<p><a href="#" class="button '. $args['color'] .' edd-submit">'. $edd_options['edd_pceu_button_message'] .'</a></p>';
 			}
+			
+			if ( ( $this->eu_get_user_country() == "00" || $this->eu_get_user_country() == "XX" ) && $args['direct'] != FALSE ) {
+				$content = '<p><a href="#" class="button '. $args['color'] .' edd-submit">'. $edd_options['edd_pceu_button_message'] .'</a></p>';
+			}
+			
 			return $content;
 		}
 

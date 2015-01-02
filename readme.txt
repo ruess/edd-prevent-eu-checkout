@@ -17,7 +17,9 @@ This plugin requires [Easy Digital Downloads](http://wordpress.org/extend/plugin
 In an attempt to comply with the 2015 changes to VAT and the EU, this plugin prevents a customer from being able to checkout if they're from the EU. It does this by checking that the IP is not in an EU country based on data from one of two places:
 
 1. GeoIP, if it's installed for PHP: http://php.net/manual/en/book.geoip.php
+1b. If `/wp-content/edd-pec-geoip/GeoLite2-Country.mmdb' exists, it uses that
 2. Otherwise, it uses HostIP.Info: http://www.hostip.info
+3. If HostIP.info returns an XX (aka it can't detect the country) it checks via WikiMedia: http://geoiplookup.wikimedia.org/
 
 In addition, it adds a *required* checkbox that has the customer confirm they're not from the EU.
 
@@ -75,15 +77,36 @@ Then they broke the law, not you.
 
 Everyone in the EU (Austria, Belgium, Bulgaria, Croatia, Republic of Cyprus, Czech Republic, Denmark, Estonia, Finland, France, Germany, Greece, Hungary, Ireland, Italy, Latvia, Lithuania, Luxembourg, Malta, Netherlands, Poland, Portugal, Romania, Slovakia, Slovenia, Spain, Sweden and the UK).
 
-= I thought South Africa was doing this too! =
+= Why did South Africa get removed? =
 
-They were. And then they had a burst of common sense and said "If you make under R50,000/annum from digital sales, carry on!"
+They had a burst of common sense and said "If you make under R50,000/annum from digital sales, carry on!" [Source](http://www.kpmg.com/global/en/issuesandinsights/articlespublications/vat-gst-essentials/pages/south-africa.aspx)
+
+= What about Italy? =
+
+Oh you read how [Italy missed the deadline](http://www.vatlive.com/european-news/italy-misses-eu-2015-digital-services-vat-implementation-deadline/)? Yeah, I'm leaving them on. Ciao!
 
 = Why isn't this working? =
 
-The code won't run until Jan 1, 2015, based on your blog's internal chronometer. Until then, sell away!
+Basically there's no 100% free way to check for this stuff. The checkout box at the end is a fail-safe switch in case all else fails.
+
+= Why does my 'Buy Now' button say this purchase is unavailable? =
+
+If the plugin cannot detect where you're from, it gives you a country code of 00 and subsequently blocks buy-now.
+
+= How can I use the GeoIP DB? =
+
+Create a folder in `wp-content` called `edd-pec-geoip`
+
+In that put the file `GeoLite2-Country.mmdb` (downloadable from [Maxmind](http://dev.maxmind.com/geoip/geoip2/geolite2/)). The plugin will look for that file, in that location, and if it's there it'll run the MaxMindDB API to check your IP.
+
+''NOTICE'' That database is licensed Creative Commons Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0), which means you are required to credit them on your site. It also means I can't include the code here, and I'm not responsible for your updates.
 
 == Changelog ==
+
+= 1.0.5 =
+* Adding in another failsafe switch via MediaWiki
+* Allowing people to manually install GeoIP DBs
+* If country cannot be determined, kill Buy Now.
 
 = 1.0.4 =
 * Removing South Africa ([Per KPMG](http://www.kpmg.com/global/en/issuesandinsights/articlespublications/vat-gst-essentials/pages/south-africa.aspx) the threshold is R50,000)
