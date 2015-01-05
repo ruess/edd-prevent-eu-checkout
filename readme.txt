@@ -103,6 +103,9 @@ In that put the file `GeoLite2-Country.mmdb` (downloadable from [Maxmind](http:/
 
 == Changelog ==
 
+= 1.0.7 =
+* Hide payment selection too, if you're in the EU (props @tctc91)
+
 = 1.0.6 =
 * Removed Mediawiki - Slow and weird results in the long term.
 

@@ -3,7 +3,7 @@
 Plugin Name: EDD - Prevent Checkout for the EU
 Plugin URI: http://halfelf.org/plugins/edd-prevent-eu-checkout
 Description: Prevents customer from being able to checkout if they're from the EU because VAT laws are stupid.
-Version: 1.0.6
+Version: 1.0.7
 Author: Mika A. Epstein (Ipstenu)
 Author URI: http://halfelf.org
 License: GPL-2.0+
@@ -83,6 +83,9 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 
 			// prevent form from being loaded
 			add_filter( 'edd_can_checkout', array( $this, 'can_checkout' ) );
+			
+			// prevent payment select box from showing
+			add_filter( 'edd_show_gateways', array( $this, 'can_checkout' ) );
 
 			// prevent Buy Now button from displaying
 			add_filter( 'edd_purchase_download_form', array( $this, 'prevent_purchase_button' ), 10, 2 );
