@@ -63,7 +63,7 @@ I don't know. Again, not a lawyer. Ask one.
 
 = How does it know if someone is in the EU? =
 
-It checks their IP address against GeoIP (if installed with your PHP) and then against http://www.hostip.info
+It checks their IP address against GeoIP (if installed on your server) and then against http://www.hostip.info
 
 = What if that's wrong? =
 
@@ -85,7 +85,7 @@ They had a burst of common sense and said "If you make under R50,000/annum from 
 
 Oh you read how [Italy missed the deadline](http://www.vatlive.com/european-news/italy-misses-eu-2015-digital-services-vat-implementation-deadline/)? Yeah, I'm leaving them on. Ciao!
 
-= Why isn't this working? =
+= Someone from the EU just bought my products! Why isn't this working? =
 
 Basically there's no 100% free way to check for this stuff. The checkout box at the end is a fail-safe switch in case all else fails.
 
