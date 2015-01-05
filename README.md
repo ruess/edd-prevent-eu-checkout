@@ -18,4 +18,4 @@ The official home of the plugin is on WordPress.org as [EDD Prevent EU Checkout]
 
 ## Changelog ##
 
-~Current Version:1.0.5~
+~Current Version:1.0.6~

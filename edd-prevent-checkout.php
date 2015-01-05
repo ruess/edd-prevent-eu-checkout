@@ -1,15 +1,16 @@
 <?php
 /*
 Plugin Name: EDD - Prevent Checkout for the EU
-Plugin URI: https://github.com/Ipstenu/edd-prevent-eu-checkout
+Plugin URI: http://halfelf.org/plugins/edd-prevent-eu-checkout
 Description: Prevents customer from being able to checkout if they're from the EU because VAT laws are stupid.
-Version: 1.0.5
-Author: Andrew Munro (Sumobi), Mika A. Epstein (Ipstenu)
-Author URI: http://sumobi.com/
+Version: 1.0.6
+Author: Mika A. Epstein (Ipstenu)
+Author URI: http://halfelf.org
 License: GPL-2.0+
 License URI: http://www.opensource.org/licenses/gpl-license.php
 
-Forked from http://sumobi.com/shop/edd-prevent-checkout/
+Forked from http://sumobi.com/shop/edd-prevent-checkout/ by Andrew Munro (Sumobi)
+
 */
 
 /* Preflight checklist */
@@ -304,26 +305,14 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 				} catch (Exception $e) {
 					// If the IP isn't listed here, we have to do this
 					$this_country = "XX";
-				}				
+				}
 			} else {
 				// Otherwise we use HostIP.info which is GPL (results in XX if country does not exist)
 				$this_country = file_get_contents('http://api.hostip.info/country.php?ip=' . $this->eu_get_user_ip() );
 			}
 
-			// Hail Mary Pass - if we've failed all around and gotten an XX, we'll try wikipedia. 
-			if ( $this_country == "XX" ) {
-				try {
-					$wikijson = substr( file_get_contents('http://geoiplookup.wikimedia.org/'), 5);
-					$wikijsonarray = json_decode($wikijson, true);
-					$this_country = $wikijsonarray['country'];
-				} catch (Exception $e) {
-					// If this failed, lets set to 00 and carry on.
-					$this_country = "00";
-				}
-			}
-			
-			if ( is_null( $this_country ) ) {
-				// If nothing got set for whatever reason, we force 00
+			if ( is_null( $this_country ) || $this_country == "XX" ) {
+				// If nothing got set for whatever reason, we force 00 since that will never be used
 				$this_country = "00";
 			}
 
@@ -451,11 +440,11 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 			if ( $this->block_eu_required() == TRUE ) {
 				$content = '<p><a href="#" class="button '. $args['color'] .' edd-submit">'. $edd_options['edd_pceu_button_message'] .'</a></p>';
 			}
-			
+
 			if ( ( $this->eu_get_user_country() == "00" || $this->eu_get_user_country() == "XX" ) && $args['direct'] != FALSE ) {
 				$content = '<p><a href="#" class="button '. $args['color'] .' edd-submit">'. $edd_options['edd_pceu_button_message'] .'</a></p>';
 			}
-			
+
 			return $content;
 		}
 
