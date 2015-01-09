@@ -93,6 +93,10 @@ Basically there's no 100% free way to check for this stuff. The checkout box at 
 
 If the plugin cannot detect where you're from, it gives you a country code of 00 and subsequently blocks buy-now. You can customize the text in the plugin settings.
 
+= Why does the checkbox show up twice? =
+
+The EU VAT Compliance Confirmation shows up twice, once for user registration and once for personal info, if you have "Display the registration and login forms on the checkout page for non-logged-in users." set to anything but none. This is because EDD didn't make the filter only affect one section. This will be fixed in EDD 2.3 (see (#2857)[https://github.com/easydigitaldownloads/Easy-Digital-Downloads/issues/2857]), but is something you'll have to live with for now, as rewriting that whole function is tricky to make it work for all users.
+
 = How can I use the GeoIP DB? =
 
 Create a folder in `wp-content` called `edd-pec-geoip`
