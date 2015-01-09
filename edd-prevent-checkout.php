@@ -3,7 +3,7 @@
 Plugin Name: EDD - Prevent Checkout for the EU
 Plugin URI: http://halfelf.org/plugins/edd-prevent-eu-checkout
 Description: Prevents customer from being able to checkout if they're from the EU because VAT laws are stupid.
-Version: 1.0.7
+Version: 1.0.7-beta
 Author: Mika A. Epstein (Ipstenu)
 Author URI: http://halfelf.org
 License: GPL-2.0+
@@ -519,7 +519,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 				array(
 					'id' => 'edd_pceu_general_message',
 					'name' => __( 'General Message', 'edd-prevent-eu-checkout' ),
-					'desc' => __( 'Will be displayed at the top of every page where downloads are shown. HTML is accepted.', 'edd-prevent-eu-checkout' ),
+					'desc' => __( 'Will be displayed at the top of every page where downloads are shown. (HTML accepted)', 'edd-prevent-eu-checkout' ),
 					'type' => 'textarea',
 					'std' => 'At this time we are unable to complete sales to EU residents. <a href="#">Why?</a>'
 				),
@@ -535,16 +535,16 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 				array(
 					'id' => 'edd_pceu_checkout_message',
 					'name' => __( 'Checkout Message', 'edd-prevent-eu-checkout' ),
-					'desc' => __( 'Will be displayed on attempt to checkout. HTML is accepted.', 'edd-prevent-eu-checkout' ),
+					'desc' => __( 'Will be displayed on attempt to checkout. (HTML accepted)', 'edd-prevent-eu-checkout' ),
 					'type' => 'textarea',
 					'std' => 'At this time we are unable to complete sales to EU residents. <a href="#">Why?</a>'
 				),
 				
 				array(
 					'id' => 'edd_pceu_checkbox_message',
-					'name' => __( 'Checkbox Alter Message', 'edd-prevent-eu-checkout' ),
-					'desc' => __( 'Will be displayed below a confirmation checkbox.', 'edd-prevent-eu-checkout' ),
-					'type' => 'text',
+					'name' => __( 'Checkbox Alert Message', 'edd-prevent-eu-checkout' ),
+					'desc' => __( 'Will be displayed below a confirmation checkbox. (HTML accepted)', 'edd-prevent-eu-checkout' ),
+					'type' => 'textarea',
 					'std' => 'By checking this box you confirm you are either a business or not a legal EU resident.'
 				),
 				
@@ -585,7 +585,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 			$input['edd_pceu_checkout_message'] = wp_kses_post( $input['edd_pceu_checkout_message'] );
 
 			// Sanitize edd_pceu_checkbox_message
-			$input['edd_pceu_checkbox_message'] = sanitize_text_field( $input['edd_pceu_checkbox_message'] );
+			$input['edd_pceu_checkbox_message'] = wp_kses_post( $input['edd_pceu_checkbox_message'] );
 			
 			// Sanitize edd_pceu_exclude
 			if ( in_array($input['edd_pceu_exclude'], $this->eu_get_country_list()) || array_key_exists($input['edd_pceu_exclude'], $this->eu_get_country_list()) ) {
