@@ -99,6 +99,10 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 			// Add checkout field
 			add_action('edd_purchase_form_user_info', array( $this, 'custom_checkout_fields') );
 
+			// When 2.3 comes out, replace with this:
+			//add_action('edd_purchase_form_user_info_fields', array( $this, 'custom_checkout_fields') );			
+			
+
 			// Validate checkout field
 			add_action('edd_checkout_error_checks', array( $this, 'validate_custom_fields'), 10, 2);
 
@@ -161,99 +165,6 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 
 			return apply_filters( 'eu_country_list', $countries );
 			return $countries;
-		}
-
-		/**
-		 * Get list of EU Exclusions
-		 * Some territories/areas are not applicable for VAT
-		 * This function is NOT YET being used.
-		 *
-		 * @access      public
-		 * @since       1.0
-		 * @param null $country
-		 * @return mixed|void  A list of territories excluded, based on the customer's country
-		 */
-
-		public function eu_get_territory_exclustion_list( $country = null ) {
-
-			if( empty( $country ) )
-				$country = $this->eu_get_ip();
-
-			switch( $country ) :
-
-				// Denmark:
-				case 'DK' :
-					$territories = array(
-						'FO' => 'Faroe Islands',
-						'GL' => 'Greenland',
-					);
-				break;
-				// Spain
-				case 'ES' :
-					$territories =  array(
-						'ES' => 'Canary Islands',
-						'ES' => 'Ceuta',
-						'ES' => 'Melilla',
-					);
-				break;
-				// Finland:
-				case 'FI' :
-					$territories =  array(
-						'AX' => '&#197;land Islands',
-					);
-				break;
-				// France:
-				case 'FR' :
-					$territories =  array(
-						'RE' => 'Réunion',
-						'GP' => 'Guadeloupe',
-						'MF' => 'Saint Martin (French part)',
-						'FR' => 'Overseas departments',
-					);
-				break;
-				//Germany:
-				case 'DE' :
-					$territories =  array(
-						'DE' => 'Büsingen am Hochrhein',
-						'DE' => 'Heligoland',
-					);
-				break;
-				//Greece:
-				case 'GR' :
-					$territories =  array(
-						'DE' => 'Mount Athos',
-					);
-				break;
-				//Italy:
-				case 'IT' :
-					$territories =  array(
-						'IT' => 'some parts bordering to Switzerland',
-						'IT' => 'Campione d\'Italia',
-						'IT' => 'Livigno',
-						'IT' => 'The Italian waters of Lake Lugano',
-					);
-				break;
-				//Netherlands:
-				case 'NL' :
-					$territories =  array(
-						'AW' => 'Aruba',
-						'CW' => 'Curaçao',
-						'SX' => 'Saint Martin (Dutch part)',
-						'NL' => 'The Caribbean Netherlands',
-					);
-				break;
-				//United Kingdom:
-				case 'UK' :
-					$territories =  array(
-						'GI' => 'Gibraltar',
-						'NL' => 'Channel Islands',
-						'NL' => 'British Overseas Territories',
-					);
-
-			endswitch;
-
-			return apply_filters( 'eu_territory_exclustion_list', $territories );
-
 		}
 
 		/**
