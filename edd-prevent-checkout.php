@@ -463,10 +463,13 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 
 			// If the plugin is running and the dates are okay
 			if ( $this->eu_get_running() == TRUE && $this->eu_get_dates() == TRUE ) {
+
+				global $edd_options;
+
 				?>
 				<p id='edd-eu-wrap'>
 					<label class='edd-label' for='edd-eu'><?php _e('EU VAT Compliance Confirmation', 'edd-prevent-eu-checkout', 'edd-prevent-eu-checkout'); ?></label>
-					<span class='edd-description'><input class='edd-checkbox' type='checkbox' name='edd_eu' id='edd-eu' value='1' /> <?php _e('By checking this box you confirm you are either a business or not a legal EU resident.', 'edd-prevent-eu-checkout', 'edd-prevent-eu-checkout'); ?></span>
+					<span class='edd-description'><input class='edd-checkbox' type='checkbox' name='edd_eu' id='edd-eu' value='1' /> <?php _e($edd_options['edd_pceu_checkbox_message']); ?></span>
 				</p>
 				<?php
 			}
@@ -536,7 +539,15 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 					'type' => 'textarea',
 					'std' => 'At this time we are unable to complete sales to EU residents. <a href="#">Why?</a>'
 				),
-
+				
+				array(
+					'id' => 'edd_pceu_checkbox_message',
+					'name' => __( 'Checkbox Alter Message', 'edd-prevent-eu-checkout' ),
+					'desc' => __( 'Will be displayed below a confirmation checkbox.', 'edd-prevent-eu-checkout' ),
+					'type' => 'text',
+					'std' => 'By checking this box you confirm you are either a business or not a legal EU resident.'
+				),
+				
 				array(
 					'id' => 'edd_pceu_exclude',
 					'name' => __( 'Exclude Country', 'edd-prevent-eu-checkout' ),
@@ -573,6 +584,9 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 			// Sanitize edd_pceu_checkout_message
 			$input['edd_pceu_checkout_message'] = wp_kses_post( $input['edd_pceu_checkout_message'] );
 
+			// Sanitize edd_pceu_checkbox_message
+			$input['edd_pceu_checkbox_message'] = sanitize_text_field( $input['edd_pceu_checkbox_message'] );
+			
 			// Sanitize edd_pceu_exclude
 			if ( in_array($input['edd_pceu_exclude'], $this->eu_get_country_list()) || array_key_exists($input['edd_pceu_exclude'], $this->eu_get_country_list()) ) {
 				$input['edd_pceu_exclude'] = $input['edd_pceu_exclude'];
