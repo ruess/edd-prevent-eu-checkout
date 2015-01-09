@@ -222,7 +222,12 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 				}
 			} else {
 				// Otherwise we use HostIP.info which is GPL (results in XX if country does not exist)
-				$this_country = file_get_contents('http://api.hostip.info/country.php?ip=' . $this->eu_get_user_ip() );
+				try {
+					$this_country = file_get_contents('http://api.hostip.info/country.php?ip=' . $this->eu_get_user_ip() );
+				} catch (Exception $e) {
+					// If the API isn't available, we have to do this
+					$this_country = "XX";					
+				}
 			}
 
 			if ( is_null( $this_country ) || $this_country == "XX" ) {
@@ -236,6 +241,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 		/**
 		 * Jan 1 2015 or later?
 		 * Checks to make sure it's time to envoke this plugin.
+		 * Keeping this in case the law changes and we need to disable.
 		 *
 		 * @since 1.0
 		*/
