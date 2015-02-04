@@ -4,7 +4,7 @@ Donate link: https://store.halfelf.org/donate/
 Tags: easy digital downloads, edd, purchase, prevent, checkout, e-commerce, eu, VAT
 Requires at least: 3.3
 Tested up to: 4.1
-Stable tag: 1.0.7
+Stable tag: 1.0.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -106,6 +106,9 @@ In that put the file `GeoLite2-Country.mmdb` (downloadable from [Maxmind](http:/
 ''NOTICE'' That database is licensed Creative Commons Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0), which means you are required to credit them on your site. It also means I can't include the code here, and I'm not responsible for your updates.
 
 == Changelog ==
+
+= 1.0.8 =
+* Speed up hostip checks with timeouts and surpress errors (props @maurisrx)
 
 = 1.0.7 =
 * Hide payment selection too, if you're in the EU (props @tctc91)

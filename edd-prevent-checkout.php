@@ -3,7 +3,7 @@
 Plugin Name: EDD - Prevent Checkout for the EU
 Plugin URI: http://halfelf.org/plugins/edd-prevent-eu-checkout
 Description: Prevents customer from being able to checkout if they're from the EU because VAT laws are stupid.
-Version: 1.0.7
+Version: 1.0.8
 Author: Mika A. Epstein (Ipstenu)
 Author URI: http://halfelf.org
 License: GPL-2.0+
@@ -223,7 +223,18 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 			} else {
 				// Otherwise we use HostIP.info which is GPL (results in XX if country does not exist)
 				try {
-					$this_country = file_get_contents('http://api.hostip.info/country.php?ip=' . $this->eu_get_user_ip() );
+					// Setting timeout limit to speed up sites
+					$context = stream_context_create( 
+						array(
+					    	'http' => array( 
+					    		'timeout' => 1, 
+								),
+						)
+					);
+					
+					// Using @file... to supress errors
+					$this_country = @file_get_contents('http://api.hostip.info/country.php?ip=' . $this->eu_get_user_ip(), false, $context);
+
 				} catch (Exception $e) {
 					// If the API isn't available, we have to do this
 					$this_country = "XX";					
