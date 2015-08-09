@@ -3,7 +3,7 @@
 Plugin Name: EDD - Prevent Checkout for the EU
 Plugin URI: http://halfelf.org/plugins/edd-prevent-eu-checkout
 Description: Prevents customer from being able to checkout if they're from the EU because VAT laws are stupid.
-Version: 1.0.8
+Version: 1.0.9
 Author: Mika A. Epstein (Ipstenu)
 Author URI: http://halfelf.org
 License: GPL-2.0+
@@ -83,7 +83,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 
 			// prevent form from being loaded
 			add_filter( 'edd_can_checkout', array( $this, 'can_checkout' ) );
-			
+
 			// prevent payment select box from showing
 			add_filter( 'edd_show_gateways', array( $this, 'can_checkout' ) );
 
@@ -100,8 +100,8 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 			add_action('edd_purchase_form_user_info', array( $this, 'custom_checkout_fields') );
 
 			// When 2.3 comes out, replace with this:
-			//add_action('edd_purchase_form_user_info_fields', array( $this, 'custom_checkout_fields') );			
-			
+			//add_action('edd_purchase_form_user_info_fields', array( $this, 'custom_checkout_fields') );
+
 
 			// Validate checkout field
 			add_action('edd_checkout_error_checks', array( $this, 'validate_custom_fields'), 10, 2);
@@ -224,20 +224,20 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 				// Otherwise we use HostIP.info which is GPL (results in XX if country does not exist)
 				try {
 					// Setting timeout limit to speed up sites
-					$context = stream_context_create( 
+					$context = stream_context_create(
 						array(
-					    	'http' => array( 
-					    		'timeout' => 1, 
+					    	'http' => array(
+					    		'timeout' => 1,
 								),
 						)
 					);
-					
+
 					// Using @file... to supress errors
 					$this_country = @file_get_contents('http://api.hostip.info/country.php?ip=' . $this->eu_get_user_ip(), false, $context);
 
 				} catch (Exception $e) {
 					// If the API isn't available, we have to do this
-					$this_country = "XX";					
+					$this_country = "XX";
 				}
 			}
 
@@ -390,7 +390,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 		function custom_checkout_fields() {
 
 			// If the plugin is running and the dates are okay
-			if ( $this->eu_get_running() == TRUE && $this->eu_get_dates() == TRUE ) {
+			if ( $this->eu_get_running() == TRUE && $this->eu_get_dates() == TRUE && $this->block_eu_required() == TRUE ) {
 
 				global $edd_options;
 
@@ -413,7 +413,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 			if ( $this->eu_get_running() == TRUE && $this->eu_get_dates() == TRUE ) {
 				global $edd_options;
 
-				if ( !isset( $data['edd_eu'] ) || $data['edd_eu'] != '1' ) {
+				if ( ( !isset( $data['edd_eu'] ) || $data['edd_eu'] != '1' ) && $this->block_eu_required() !== TRUE ) {
 					$data['edd_eu'] = 0;
 					edd_set_error( 'eu_not_checked', apply_filters( 'edd_pceu_error_message', $edd_options['edd_pceu_checkout_message'] ) );
 				} else {
@@ -467,7 +467,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 					'type' => 'textarea',
 					'std' => 'At this time we are unable to complete sales to EU residents. <a href="#">Why?</a>'
 				),
-				
+
 				array(
 					'id' => 'edd_pceu_checkbox_message',
 					'name' => __( 'Checkbox Alert Message', 'edd-prevent-eu-checkout' ),
@@ -475,7 +475,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 					'type' => 'textarea',
 					'std' => 'By checking this box you confirm you are either a business or not a legal EU resident.'
 				),
-				
+
 				array(
 					'id' => 'edd_pceu_exclude',
 					'name' => __( 'Exclude Country', 'edd-prevent-eu-checkout' ),
@@ -497,7 +497,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 		function sanitize_settings( $input ) {
 
 			// Sanitize checkbox
-			if ( ! isset( $input['edd_pceu_checkbox'] ) || $input['edd_pceu_checkbox'] != '1' ) {
+			if ( ( ! isset( $input['edd_pceu_checkbox'] ) || $input['edd_pceu_checkbox'] != '1' ) && $this->block_eu_required() !== TRUE ) {
 				$input['edd_pceu_checkbox'] = 0;
 			} else {
 				$input['edd_pceu_checkbox'] = 1;
@@ -514,7 +514,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 
 			// Sanitize edd_pceu_checkbox_message
 			$input['edd_pceu_checkbox_message'] = wp_kses_post( $input['edd_pceu_checkbox_message'] );
-			
+
 			// Sanitize edd_pceu_exclude
 			if ( in_array($input['edd_pceu_exclude'], $this->eu_get_country_list()) || array_key_exists($input['edd_pceu_exclude'], $this->eu_get_country_list()) ) {
 				$input['edd_pceu_exclude'] = $input['edd_pceu_exclude'];
