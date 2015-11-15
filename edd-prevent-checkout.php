@@ -3,7 +3,7 @@
 Plugin Name: EDD - Prevent Checkout for the EU
 Plugin URI: http://halfelf.org/plugins/edd-prevent-eu-checkout
 Description: Prevents customer from being able to checkout if they're from the EU because VAT laws are stupid.
-Version: 1.0.9
+Version: 1.1
 Author: Mika A. Epstein (Ipstenu)
 Author URI: http://halfelf.org
 License: GPL-2.0+
@@ -60,7 +60,38 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 		 * @return void
 		 */
 		public function __construct() {
-			$this->setup_actions();
+			if ( !file_exists( plugin_dir_path( 'easy-digital-downloads/easy-digital-downloads.php' ) ) ) {
+				add_action( 'admin_init', array( &$this, 'plugin_deactivate' ) );
+			    add_action( 'admin_notices', array( &$this, 'plugin_deactivate_notice' ) );
+			} else {
+				$this->setup_actions();
+			}
+		}
+
+		/**
+		 * plugin_deactivate
+		 *
+		 * Deactive the plugin if called.
+		 *
+		 * @since 1.1
+		 * @access public
+		 */
+		public function plugin_deactivate() {
+			deactivate_plugins( plugin_basename( __FILE__ ) );
+		}
+
+		/**
+		 * plugin_deactivate_message
+		 *
+		 * Why we deactivated the plugin
+		 *
+		 * @since 1.1
+		 * @access public
+		 */
+		public function plugin_deactivate_notice() {
+			echo '<div class="error notice is-dismissable"><p><strong>EDD - Prevent EU Checkout</strong> requires that Easy Digital Downloads be installed; the plug-in has been <strong>deactivated</strong>.</p></div>';
+			if ( isset( $_GET['activate'] ) )
+				unset( $_GET['activate'] );
 		}
 
 		/**
@@ -97,11 +128,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 			add_filter( 'edd_settings_extensions_sanitize', array( $this, 'sanitize_settings' ) );
 
 			// Add checkout field
-			add_action('edd_purchase_form_user_info', array( $this, 'custom_checkout_fields') );
-
-			// When 2.3 comes out, replace with this:
-			//add_action('edd_purchase_form_user_info_fields', array( $this, 'custom_checkout_fields') );
-
+			add_action('edd_purchase_form_user_info_fields', array( $this, 'custom_checkout_fields') );
 
 			// Validate checkout field
 			add_action('edd_checkout_error_checks', array( $this, 'validate_custom_fields'), 10, 2);
@@ -390,7 +417,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 		function custom_checkout_fields() {
 
 			// If the plugin is running and the dates are okay
-			if ( $this->eu_get_running() == TRUE && $this->eu_get_dates() == TRUE && $this->block_eu_required() == TRUE ) {
+			if ( $this->eu_get_running() == TRUE && $this->eu_get_dates() == TRUE ) {
 
 				global $edd_options;
 
@@ -413,7 +440,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 			if ( $this->eu_get_running() == TRUE && $this->eu_get_dates() == TRUE ) {
 				global $edd_options;
 
-				if ( ( !isset( $data['edd_eu'] ) || $data['edd_eu'] != '1' ) && $this->block_eu_required() !== TRUE ) {
+				if ( !isset( $data['edd_eu'] ) || $data['edd_eu'] != '1' ) {
 					$data['edd_eu'] = 0;
 					edd_set_error( 'eu_not_checked', apply_filters( 'edd_pceu_error_message', $edd_options['edd_pceu_checkout_message'] ) );
 				} else {
@@ -497,7 +524,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 		function sanitize_settings( $input ) {
 
 			// Sanitize checkbox
-			if ( ( ! isset( $input['edd_pceu_checkbox'] ) || $input['edd_pceu_checkbox'] != '1' ) && $this->block_eu_required() !== TRUE ) {
+			if ( ! isset( $input['edd_pceu_checkbox'] ) || $input['edd_pceu_checkbox'] != '1' ) {
 				$input['edd_pceu_checkbox'] = 0;
 			} else {
 				$input['edd_pceu_checkbox'] = 1;
@@ -538,21 +565,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
  * @return void
  */
 
-if ( !class_exists( 'Easy_Digital_Downloads' ) ) {
-	// We can't activate so let's throw a warning
-	 add_action( 'admin_notices', 'edd_prevent_eu_checkout_admin_notice' );
-} else {
-	// We can load! Let's do this thing!
-	add_action( 'plugins_loaded', 'edd_prevent_eu_checkout_load' );
-}
-
-function edd_prevent_eu_checkout_admin_notice() {
-    ?>
-    <div class="error">
-        <p><?php _e( 'EDD Prevent EU Checkout cannot run without EDD installed.', 'edd-prevent-eu-checkout' ); ?></p>
-    </div>
-    <?php
-}
+add_action( 'plugins_loaded', 'edd_prevent_eu_checkout_load' );
 
 function edd_prevent_eu_checkout_load() {
 	$edd_prevent_checkout = new EDD_Prevent_EU_Checkout();

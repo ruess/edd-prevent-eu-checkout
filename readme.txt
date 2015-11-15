@@ -3,12 +3,12 @@ Contributors: Ipstenu
 Donate link: https://store.halfelf.org/donate/
 Tags: easy digital downloads, edd, purchase, prevent, checkout, e-commerce, eu, VAT
 Requires at least: 3.3
-Tested up to: 4.3
-Stable tag: 1.0.8
+Tested up to: 4.4
+Stable tag: 1.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Prevents customer from being able to checkout if they're from the EU.
+Prevents customer from being able to checkout if they're from the EU. Sometimes it sucks to be EU.
 
 == Description ==
 
@@ -105,7 +105,15 @@ In that put the file `GeoLite2-Country.mmdb` (downloadable from [Maxmind](http:/
 
 ''NOTICE'' That database is licensed Creative Commons Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0), which means you are required to credit them on your site. It also means I can't include the code here, and I'm not responsible for your updates.
 
+= Is it true this plugin is also called 'sucks to be eu'? =
+
+Yes. Why?
+
 == Changelog ==
+
+= 1.1 =
+* Better error if EDD isn't around.
+* Move checkout fields to `edd_purchase_form_user_info_fields`
 
 = 1.0.8 =
 * Speed up hostip checks with timeouts and surpress errors (props @maurisrx)
