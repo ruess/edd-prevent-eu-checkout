@@ -4,7 +4,7 @@ Donate link: https://store.halfelf.org/donate/
 Tags: easy digital downloads, edd, purchase, prevent, checkout, e-commerce, eu, VAT
 Requires at least: 3.3
 Tested up to: 4.4
-Stable tag: 1.1
+Stable tag: 1.1.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -110,6 +110,9 @@ In that put the file `GeoLite2-Country.mmdb` (downloadable from [Maxmind](http:/
 Yes. Why?
 
 == Changelog ==
+
+= 1.1.1 =
+* Correct error where, in some cases, it couldn't tell EDD was active.
 
 = 1.1 =
 * Better error if EDD isn't around.
