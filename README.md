@@ -14,8 +14,8 @@ Prevents customer from being able to checkout if they're from the EU.
 
 This plugin is an attempt to comply with the 2015 changes to VAT and the EU, this plugin prevents a customer from being able to checkout if they're from the EU.
 
-The official home of the plugin is on WordPress.org as [EDD Prevent EU Checkout](https://wordpress.org/plugins/edd-prevent-eu-checkout/) but all devwork is done here. Pull requests and issues welcome!
+The official home of the plugin is on WordPress.org as [EDD Prevent EU Checkout](https://wordpress.org/plugins/edd-prevent-eu-checkout/) but all dev work is done here. Pull requests and issues welcome!
 
 ## Changelog ##
 
-~Current Version:1.0.8~
+~Current Version:1.1.2~
