@@ -19,7 +19,7 @@ In an attempt to comply with the 2015 changes to VAT and the EU, this plugin pre
 1. GeoIP, if it's installed for PHP: http://php.net/manual/en/book.geoip.php
 1b. If `/wp-content/edd-pec-geoip/GeoLite2-Country.mmdb' exists, it uses that
 2. Otherwise, it uses HostIP.Info: http://www.hostip.info
-3. If HostIP.info returns an XX (aka it can't detect the country) it blocks "Buy Now" buttons.
+3. If HostIP.info returns an ZZ (aka it can't detect the country) it blocks "Buy Now" buttons.
 
 In addition, it adds a *required* checkbox that has the customer confirm they're not from the EU.
 
