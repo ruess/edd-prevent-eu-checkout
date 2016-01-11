@@ -3,11 +3,12 @@
 Plugin Name: EDD - Prevent Checkout for the EU
 Plugin URI: http://halfelf.org/plugins/edd-prevent-eu-checkout
 Description: Prevents customer from being able to checkout if they're from the EU because VAT laws are stupid.
-Version: 1.1.2
+Version: 1.2.0
 Author: Mika A. Epstein (Ipstenu)
 Author URI: http://halfelf.org
 License: GPL-2.0+
 License URI: http://www.opensource.org/licenses/gpl-license.php
+Text Domain: edd-prevent-eu-checkout
 
 Forked from http://sumobi.com/shop/edd-prevent-checkout/ by Andrew Munro (Sumobi)
 
@@ -89,7 +90,9 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 		 * @access public
 		 */
 		public function plugin_deactivate_notice() {
-			echo '<div class="error notice is-dismissable"><p><strong>EDD - Prevent EU Checkout</strong> requires that Easy Digital Downloads be installed; the plug-in has been <strong>deactivated</strong>.</p></div>';
+			
+			?><div class="error notice is-dismissable"><p><?php _e('EDD - Prevent EU Checkout requires that Easy Digital Downloads be installed; the plug-in has been deactivated', 'edd-prevent-eu-checkout', 'edd-prevent-eu-checkout'); ?></p></div><?php
+			
 			if ( isset( $_GET['activate'] ) )
 				unset( $_GET['activate'] );
 		}
@@ -136,7 +139,6 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 			add_action('edd_checkout_error_checks', array( $this, 'validate_custom_fields'), 10, 2);
 
 			do_action( 'edd_pceu_setup_actions' );
-
 		}
 
 		/**
@@ -145,7 +147,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 		 * @since 1.0
 		 */
 		function textdomain() {
-			load_plugin_textdomain( 'edd-prevent-eu-checkout', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
+			load_plugin_textdomain( 'edd-prevent-eu-checkout' );
 		}
 
 		/**
@@ -189,7 +191,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 				'SI' => 'Slovenia',
 				'SK' => 'Slovakia',
 				//'ZA' => 'South Africa', # Per http://www.kpmg.com/global/en/issuesandinsights/articlespublications/vat-gst-essentials/pages/south-africa.aspx the threshold is R50,000
-				// 'XX' => 'Unknown', # This is for testing only.
+				//'XX' => 'Unknown', # This is for testing only.
 			);
 
 			return apply_filters( 'eu_country_list', $countries );
@@ -279,6 +281,27 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 		}
 
 		/**
+		 * Check the country on the billing address
+		 *
+		 * @since 1.2
+		*/
+		function eu_get_billing_country() {
+
+			$user_address = edd_get_customer_address();
+
+			if( empty( $country ) ) {
+				if( ! empty( $_POST['billing_country'] ) ) {
+					$country = $_POST['billing_country'];
+				} elseif( is_user_logged_in() && ! empty( $user_address ) ) {
+					$country = $user_address['country'];
+				}
+				$country = ! empty( $country ) ? $country : edd_get_shop_country();
+			}
+			
+			return $country;
+		}
+
+		/**
 		 * Jan 1 2015 or later?
 		 * Checks to make sure it's time to envoke this plugin.
 		 * Keeping this in case the law changes and we need to disable.
@@ -301,10 +324,10 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 		 * Check if restrictions need to be applied
 		 *
 		 * Returns true if the following are also true
-		 * 1) Checkbox is check
-		 * 2) Dates are now or later
-		 * 3) User country is NOT excluded
-		 * 4) User country IS on the list
+		 * 1) Checkbox is checked
+		 * 2) Dates are within the VAT range of applicability
+		 * 3) User's detected country is NOT excluded
+		 * 4) User's detected country IS on the list
 		 *
 		 * @since 1.0
 		*/
@@ -442,7 +465,14 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 			if ( $this->eu_get_running() == TRUE && $this->eu_get_dates() == TRUE ) {
 				global $edd_options;
 
-				if ( !isset( $data['edd_eu'] ) || $data['edd_eu'] != '1' ) {
+				if ( 
+					!isset( $data['edd_eu'] ) || 
+					$data['edd_eu'] != '1' ||
+					( 
+						$this->eu_get_billing_country() != $edd_options['edd_pceu_exclude'] &&
+						array_key_exists( $this->eu_get_billing_country(), $this->eu_get_country_list() )
+					)
+				) {
 					$data['edd_eu'] = 0;
 					edd_set_error( 'eu_not_checked', apply_filters( 'edd_pceu_error_message', $edd_options['edd_pceu_checkout_message'] ) );
 				} else {
