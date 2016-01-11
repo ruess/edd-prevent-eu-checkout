@@ -118,7 +118,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 			// prevent form from being loaded
 			add_filter( 'edd_can_checkout', array( $this, 'can_checkout' ) );
 
-			// prevent payment select box from showing
+			// prevent payment select box from showing (only if you show gateways in the first place)
 			if ( edd_show_gateways() ) {
 				add_filter( 'edd_show_gateways', array( $this, 'can_checkout' ) );
 			}
@@ -146,7 +146,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 		 *
 		 * @since 1.0
 		 */
-		function textdomain() {
+		public function textdomain() {
 			load_plugin_textdomain( 'edd-prevent-eu-checkout' );
 		}
 
@@ -191,7 +191,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 				'SI' => 'Slovenia',
 				'SK' => 'Slovakia',
 				//'ZA' => 'South Africa', # Per http://www.kpmg.com/global/en/issuesandinsights/articlespublications/vat-gst-essentials/pages/south-africa.aspx the threshold is R50,000
-				//'XX' => 'Unknown', # This is for testing only.
+				//'ZZ' => 'Unknown', # This is for testing only.
 			);
 
 			return apply_filters( 'eu_country_list', $countries );
@@ -203,7 +203,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 		 *
 		 * @since 1.0
 		*/
-		function eu_get_running() {
+		public function eu_get_running() {
 
 			global $edd_options;
 
@@ -218,7 +218,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 		 *
 		 * @since 1.0
 		*/
-		function eu_get_user_ip() {
+		public function eu_get_user_ip() {
 
 			if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
 				$ip=$_SERVER['HTTP_CLIENT_IP'];
@@ -235,9 +235,13 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 		/**
 		 * Get the user's Country
 		 *
+		 * This tries to use GeoIP to get the user's country. If everything fails, it
+		 * sets the country code to ZZ to denote 'Unknown or unspecified country,' aka
+		 * a country we can't detect.
+		 *
 		 * @since 1.0
 		*/
-		function eu_get_user_country() {
+		public function eu_get_user_country() {
 
 			if (function_exists('geoip_country_code_by_name')) {
 				// If you have GeoIP installed, it's much easier: http://php.net/manual/en/book.geoip.php
@@ -249,17 +253,17 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 					$this_country = $record->country->isoCode;
 				} catch (Exception $e) {
 					// If the IP isn't listed here, we have to do this
-					$this_country = "XX";
+					$this_country = "ZZ";
 				}
 			} else {
-				// Otherwise we use HostIP.info which is GPL (results in XX if country does not exist)
+				// Otherwise we use HostIP.info which is GPL
 				try {
 					// Setting timeout limit to speed up sites
 					$context = stream_context_create(
 						array(
 					    	'http' => array(
 					    		'timeout' => 1,
-								),
+							),
 						)
 					);
 
@@ -267,13 +271,13 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 					$this_country = @file_get_contents('http://api.hostip.info/country.php?ip=' . $this->eu_get_user_ip(), false, $context);
 
 				} catch (Exception $e) {
-					// If the API isn't available, we have to do this
-					$this_country = "XX";
+					// If the API isn't available, set to ZZ
+					$this_country = "ZZ";
 				}
 			}
 
-			if ( is_null( $this_country ) || $this_country == "XX" ) {
-				// If nothing got set for whatever reason, we force ZZ since that will never be used
+			if ( is_null( $this_country ) ) {
+				// If nothing got set for whatever reason, we force ZZ
 				$this_country = "ZZ";
 			}
 
@@ -283,9 +287,13 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 		/**
 		 * Check the country on the billing address
 		 *
+		 * This is an idiot walk. If someone claims not to be EU (i.e. checks
+		 * the box) but puts in an EU country in the billing info, they should
+		 * be stopped.
+		 *
 		 * @since 1.2
 		*/
-		function eu_get_billing_country() {
+		public function eu_get_billing_country() {
 
 			$user_address = edd_get_customer_address();
 
@@ -303,12 +311,13 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 
 		/**
 		 * Jan 1 2015 or later?
+		 *
 		 * Checks to make sure it's time to envoke this plugin.
 		 * Keeping this in case the law changes and we need to disable.
 		 *
 		 * @since 1.0
 		*/
-		function eu_get_dates() {
+		public function eu_get_dates() {
 
 			$baddates = FALSE;
 
@@ -323,7 +332,8 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 		/**
 		 * Check if restrictions need to be applied
 		 *
-		 * Returns true if the following are also true
+		 * Returns true if the following are also true:
+		 *
 		 * 1) Checkbox is checked
 		 * 2) Dates are within the VAT range of applicability
 		 * 3) User's detected country is NOT excluded
@@ -331,7 +341,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 		 *
 		 * @since 1.0
 		*/
-		function block_eu_required() {
+		public function block_eu_required() {
 
 			global $edd_options;
 
@@ -350,12 +360,14 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 		}
 
 		/**
-		 * Can checkout?
-		 * Prevents the form from being displayed at all until the user's IP is outside the EU
+		 * Can checkout
+		 *
+		 * Prevents the form from being displayed at all until the user's current
+		 * physical location is outside the EU.
 		 *
 		 * @since 1.0
 		*/
-		function can_checkout( $can_checkout  ) {
+		public function can_checkout( $can_checkout  ) {
 
 			$can_checkout = FALSE;
 
@@ -367,11 +379,13 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 		}
 
 		/**
-		 * Set error message
+		 * Checkout error message
+		 *
+		 * Set the error message for checkout. This can be filtered!
 		 *
 		 * @since 1.0
 		*/
-		function set_checkout_error() {
+		public function set_checkout_error() {
 
 			global $edd_options;
 
@@ -386,14 +400,16 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 		}
 
 		/**
-		 * Conditionally add a message to content if [downloads] is loaded
+		 * Set Dowloads Message
+		 *
+		 * Conditionally add a message to content if [downloads] is loaded.
 		 *
 		 * @param  string  $content
 		 * @return string
 		 *
 		 * @since 1.0
 		*/
-		function set_downloads_message( $content ) {
+		public function set_downloads_message( $content ) {
 
 			global $edd_options;
 
@@ -411,12 +427,13 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 
 		/**
 		 * Customize purchase button
+		 *
 		 * In order to prevent the Buy Now stuff from working, we're going to go
 		 * hard core and just block it entirely.
 		 *
 		 * @since 1.0.4
 		*/
-		function prevent_purchase_button( $content, $args) {
+		public function prevent_purchase_button( $content, $args) {
 
 			global $edd_options;
 
@@ -424,7 +441,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 				$content = '<p><a href="#" class="button '. $args['color'] .' edd-submit">'. $edd_options['edd_pceu_button_message'] .'</a></p>';
 			}
 
-			if ( ( $this->eu_get_user_country() == "ZZ" || $this->eu_get_user_country() == "XX" ) && $args['direct'] != FALSE ) {
+			if ( $this->eu_get_user_country() == "ZZ" && $args['direct'] != FALSE ) {
 				$content = '<p><a href="#" class="button '. $args['color'] .' edd-submit">'. $edd_options['edd_pceu_button_message'] .'</a></p>';
 			}
 
@@ -433,13 +450,14 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 
 		/**
 		 * Custom Checkout Field
+		 *
 		 * A confirmation box. In the event someone made it all the way through IP checks
 		 * we STILL need to cover our damn asses and make sure they're not really in the
 		 * EU, so we put the onus on them to confirm 'I confirm I do not reside in the EU.'
 		 *
 		 * @since 1.0
 		*/
-		function custom_checkout_fields() {
+		public function custom_checkout_fields() {
 
 			// If the plugin is running and the dates are okay
 			if ( $this->eu_get_running() == TRUE && $this->eu_get_dates() == TRUE ) {
@@ -458,9 +476,12 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 		/**
 		 * Custom Checkout Field Sanitization
 		 *
+		 * This does one last check. If they're dumb enough to put an EU
+		 * country in their bulling address, eu_get_billing_country() will get them.
+		 *
 		 * @since 1.0
 		*/
-		function validate_custom_fields($valid_data, $data) {
+		public function validate_custom_fields($valid_data, $data) {
 
 			if ( $this->eu_get_running() == TRUE && $this->eu_get_dates() == TRUE ) {
 				global $edd_options;
@@ -486,7 +507,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 		 *
 		 * @since 1.0
 		*/
-		function settings( $settings ) {
+		public function settings( $settings ) {
 
 		  $edd_pceu_settings = array(
 				array(
@@ -553,7 +574,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 		 *
 		 * @since 1.0
 		*/
-		function sanitize_settings( $input ) {
+		public function sanitize_settings( $input ) {
 
 			// Sanitize checkbox
 			if ( ! isset( $input['edd_pceu_checkbox'] ) || $input['edd_pceu_checkbox'] != '1' ) {
