@@ -20,6 +20,9 @@ The official home of the plugin is on WordPress.org as [EDD Prevent EU Checkout]
 
 = 1.2 =
 * Improved i18n
+* Solving [Github issue #2](https://github.com/Ipstenu/edd-prevent-eu-checkout/issues/2) - Billing address is now checked for EU-ness.
+* Clean up functions
+* Documentation
 
 = 1.1.2 =
 * Solving [GitHub Issue #13](https://github.com/Ipstenu/edd-prevent-eu-checkout/issues/13) where payment gateways showed without needing to.

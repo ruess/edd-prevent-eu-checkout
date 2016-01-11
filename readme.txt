@@ -130,34 +130,3 @@ Oh you read how [Italy missed the deadline](http://www.vatlive.com/european-news
 = 1.1 =
 * Better error if EDD isn't around.
 * Move checkout fields to `edd_purchase_form_user_info_fields`
-
-= 1.0.8 =
-* Speed up hostip checks with timeouts and surpress errors (props @maurisrx)
-
-= 1.0.7 =
-* Hide payment selection too, if you're in the EU (props @tctc91)
-
-= 1.0.6 =
-* Removed Mediawiki - Slow and weird results in the long term.
-
-= 1.0.5 =
-* Adding in another failsafe switch via MediaWiki
-* Allowing people to manually install GeoIP DBs
-* If country cannot be determined, kill Buy Now.
-
-= 1.0.4 =
-* Removing South Africa ([Per KPMG](http://www.kpmg.com/global/en/issuesandinsights/articlespublications/vat-gst-essentials/pages/south-africa.aspx) the threshold is R50,000)
-* Filtering purchase buttons (nice catch @StephenCronin)
-
-= 1.0.3 =
-* Small date check improvement on checkout.
-
-= 1.0.2 =
-* Dates were wrong. You're supposed to CHECK if it's before or after Jan 1, 2015... TARDIS.
-
-= 1.0.1 =
-* '/" mixup (thanks @macmanx)
-* Better handling of failures.
-
-= 1.0 =
-* Initial release
