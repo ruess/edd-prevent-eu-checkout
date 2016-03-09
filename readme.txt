@@ -1,10 +1,10 @@
-=== EDD - Prevent EU Checkout ===
+=== Prevent EU Checkout for Easy Digital Downloads ===
 Contributors: Ipstenu
 Donate link: https://store.halfelf.org/donate/
 Tags: easy digital downloads, edd, purchase, prevent, checkout, e-commerce, eu, VAT
 Requires at least: 4.0
-Tested up to: 4.4.1
-Stable tag: 1.2.0
+Tested up to: 4.5
+Stable tag: 1.2.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -115,18 +115,11 @@ Oh you read how [Italy missed the deadline](http://www.vatlive.com/european-news
 
 == Changelog ==
 
+= 1.2.1 =
+* Improved sanitization
+
 = 1.2 =
 * Improved i18n
 * Solving [Github issue #2](https://github.com/Ipstenu/edd-prevent-eu-checkout/issues/2) - Billing address is now checked for EU-ness.
 * Clean up functions
 * Documentation
-
-= 1.1.2 =
-* Solving [GitHub Issue #13](https://github.com/Ipstenu/edd-prevent-eu-checkout/issues/13) where payment gateways showed without needing to.
-
-= 1.1.1 =
-* Correct error where, in some cases, it couldn't tell EDD was active.
-
-= 1.1 =
-* Better error if EDD isn't around.
-* Move checkout fields to `edd_purchase_form_user_info_fields`

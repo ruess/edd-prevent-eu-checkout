@@ -1,9 +1,9 @@
 <?php
 /*
-Plugin Name: EDD - Prevent Checkout for the EU
+Plugin Name: Prevent EU Checkout for Easy Digital Downloads
 Plugin URI: http://halfelf.org/plugins/edd-prevent-eu-checkout
 Description: Prevents customer from being able to checkout if they're from the EU because VAT laws are stupid.
-Version: 1.2.0
+Version: 1.2.1
 Author: Mika A. Epstein (Ipstenu)
 Author URI: http://halfelf.org
 License: GPL-2.0+
@@ -11,6 +11,8 @@ License URI: http://www.opensource.org/licenses/gpl-license.php
 Text Domain: edd-prevent-eu-checkout
 
 Forked from http://sumobi.com/shop/edd-prevent-checkout/ by Andrew Munro (Sumobi)
+
+Copyright 2014-16 Mika A Epstein (ipstenu@halfelf.org)
 
 */
 
@@ -229,7 +231,6 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
     		}
 
 			return $ip;
-
 		}
 
 		/**
@@ -276,7 +277,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 				}
 			}
 
-			if ( is_null( $this_country ) ) {
+			if ( is_null( $this_country ) || empty( $this_country ) ) {
 				// If nothing got set for whatever reason, we force ZZ
 				$this_country = "ZZ";
 			}
@@ -299,7 +300,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 
 			if( empty( $country ) ) {
 				if( ! empty( $_POST['billing_country'] ) ) {
-					$country = $_POST['billing_country'];
+					$country = sanitize_text( $_POST['billing_country'] );
 				} elseif( is_user_logged_in() && ! empty( $user_address ) ) {
 					$country = $user_address['country'];
 				}
@@ -318,15 +319,12 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 		 * @since 1.0
 		*/
 		public function eu_get_dates() {
-
 			$baddates = FALSE;
 
 			if( strtotime("01/01/2015") <= time() ) {
 				$baddates = TRUE;
 			}
-
 			return $baddates;
-
 		}
 
 		/**
@@ -594,8 +592,11 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 
 			// Sanitize edd_pceu_checkbox_message
 			$input['edd_pceu_checkbox_message'] = wp_kses_post( $input['edd_pceu_checkbox_message'] );
-
+			
 			// Sanitize edd_pceu_exclude
+			$input['edd_pceu_exclude'] = sanitize_text( $input['edd_pceu_exclude'] );
+
+			// Validate edd_pceu_exclude
 			if ( in_array($input['edd_pceu_exclude'], $this->eu_get_country_list()) || array_key_exists($input['edd_pceu_exclude'], $this->eu_get_country_list()) ) {
 				$input['edd_pceu_exclude'] = $input['edd_pceu_exclude'];
 			} else {

@@ -1,0 +1,9 @@
+= 1.1.2 =
+* Solving [GitHub Issue #13](https://github.com/Ipstenu/edd-prevent-eu-checkout/issues/13) where payment gateways showed without needing to.
+
+= 1.1.1 =
+* Correct error where, in some cases, it couldn't tell EDD was active.
+
+= 1.1 =
+* Better error if EDD isn't around.
+* Move checkout fields to `edd_purchase_form_user_info_fields`
