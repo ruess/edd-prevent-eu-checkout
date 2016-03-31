@@ -3,7 +3,7 @@
 Plugin Name: Prevent EU Checkout for Easy Digital Downloads
 Plugin URI: http://halfelf.org/plugins/edd-prevent-eu-checkout
 Description: Prevents customer from being able to checkout if they're from the EU because VAT laws are stupid.
-Version: 1.2.1
+Version: 1.2.2
 Author: Mika A. Epstein (Ipstenu)
 Author URI: http://halfelf.org
 License: GPL-2.0+
@@ -300,7 +300,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 
 			if( empty( $country ) ) {
 				if( ! empty( $_POST['billing_country'] ) ) {
-					$country = sanitize_text( $_POST['billing_country'] );
+					$country = sanitize_text_field( $_POST['billing_country'] );
 				} elseif( is_user_logged_in() && ! empty( $user_address ) ) {
 					$country = $user_address['country'];
 				}
@@ -594,7 +594,7 @@ if ( ! class_exists( 'EDD_Prevent_EU_Checkout' ) ) {
 			$input['edd_pceu_checkbox_message'] = wp_kses_post( $input['edd_pceu_checkbox_message'] );
 			
 			// Sanitize edd_pceu_exclude
-			$input['edd_pceu_exclude'] = sanitize_text( $input['edd_pceu_exclude'] );
+			$input['edd_pceu_exclude'] = sanitize_text_field( $input['edd_pceu_exclude'] );
 
 			// Validate edd_pceu_exclude
 			if ( in_array($input['edd_pceu_exclude'], $this->eu_get_country_list()) || array_key_exists($input['edd_pceu_exclude'], $this->eu_get_country_list()) ) {

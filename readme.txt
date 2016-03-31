@@ -4,7 +4,7 @@ Donate link: https://store.halfelf.org/donate/
 Tags: easy digital downloads, edd, purchase, prevent, checkout, e-commerce, eu, VAT
 Requires at least: 4.0
 Tested up to: 4.5
-Stable tag: 1.2.1
+Stable tag: 1.2.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -114,6 +114,9 @@ They had a burst of common sense and said "If you make under R50,000/annum from 
 Oh you read how [Italy missed the deadline](http://www.vatlive.com/european-news/italy-misses-eu-2015-digital-services-vat-implementation-deadline/)? Yeah, I'm leaving them on. Ciao!
 
 == Changelog ==
+
+= 1.2.2 =
+* Forgot to push the part where I changed `sanitize_text()` to `santize_text_field()` *SIGH*
 
 = 1.2.1 =
 * Improved sanitization
