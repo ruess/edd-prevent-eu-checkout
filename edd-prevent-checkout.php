@@ -2,8 +2,8 @@
 /*
 Plugin Name: Prevent EU Checkout for Easy Digital Downloads
 Plugin URI: http://halfelf.org/plugins/edd-prevent-eu-checkout
-Description: Prevents customer from being able to checkout if they're from the EU because VAT laws are stupid.
-Version: 1.2.2
+Description: Prevents customer from being able to checkout if they're from the EU because of VAT laws.
+Version: 1.3
 Author: Mika A. Epstein (Ipstenu)
 Author URI: http://halfelf.org
 License: GPL-2.0+
